@@ -5,7 +5,7 @@ export default function Home() {
     <div className="home-intro">
       <h1>Clean The Streets</h1>
       <h1>Our Mission</h1>
-      <p>GPT THE MISSION STATEMENT HERE</p>
+      <p>Commit 3/29/2025</p>
     </div>
   );
 }
