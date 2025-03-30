@@ -127,3 +127,52 @@ The '==' operator is used to determine 'equal to'.
 
 A good practice is to declare the variables at the beginning of the script
 Varibles can be defined in-line seperated by commas, this can span multiple lines
+The 'var' keyword should be the least used keyword, let and const are better for declaring variables.
+
+let Keyword:
+
+let variables:
+-have the block scope
+-must be declared before use
+-cannot be redeclared within the same scope
+
+const Keyword:
+
+const variables:
+-cannot be redeclared
+-cannot be reassigned
+-have block scope
+-must be assigned when declared
+
+The best usages for the const keyword are when you declare:
+-An array
+-An object
+-A function
+-A RegExp
+
+You can change the properties or push to an array but not reassign the variable
+
+Hoisting is an interesting concept for all of the variable types, yet it is pointless and creates room for error.
+
+Best option is to initialize the variables at the beginning of the file/block of code.
+
+Operators:
+
+'=' assigns values
+'+' adds values
+'\*' multiplies values
+'>' compares values
+
+Most operators have the same properties as operators in other languages.
+
+For logic, JavaScript uses &&, ||, and !.
+JavaScript also has Bitwise Operators:
+& => AND
+| => OR
+~ => NOT
+^ => XOR
+<< => LEFT SHIFT
+
+> > => RIGHT SHIFT
+> >
+> > > => UNSIGNED RIGHT SHIFT
