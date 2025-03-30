@@ -5,7 +5,13 @@ export default function Home() {
     <div className="home-intro">
       <h1>Clean The Streets</h1>
       <h1>Our Mission</h1>
-      <p>Commit 3/29/2025</p>
+      <p>
+        At CleanTheStreets, we believe every voice matters in creating safer,
+        smoother roads for our communities. Our mission is to empower citizens
+        across the United States to report potholes and road hazards, ensuring
+        that your input drives real change. Together, we can pave the way for a
+        safer, more efficient transportation system for everyone.
+      </p>
     </div>
   );
 }
