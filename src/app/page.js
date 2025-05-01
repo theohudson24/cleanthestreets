@@ -2,6 +2,7 @@ export default function Home() {
   return (
     //Use className for adding classes to certain elements
     //Reason: class is a keyword in Javascript
+    //Testing amrith changes
     <div className="home-intro">
       <h1 className = "text-lg font-bold text-center">Clean The Streets</h1>
       <h3 className = "text-center mb-5">Our Mission</h3>
