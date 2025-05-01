@@ -10,7 +10,7 @@ export default function Home() {
         smoother roads for our communities. Our mission is to empower citizens
         across the United States to report potholes and road hazards, ensuring
         that your input drives real change. Together, we can pave the way for a
-        safer, more efficient transportation system for everyone.
+        safer, more efficient transportation system for everyone. 
       </p>
     </div>
   );
