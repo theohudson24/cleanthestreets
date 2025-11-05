@@ -12,36 +12,46 @@ export default function NavigationBar() {
 
   useEffect(() => {
     // Check for signed-in user in localStorage
-    if (typeof window !== 'undefined') {
-      const userData = localStorage.getItem('user');
-      if (userData) {
-        try {
-          setUser(JSON.parse(userData));
-        } catch (e) {
-          // Invalid user data
+    const checkUser = () => {
+      if (typeof window !== 'undefined') {
+        const userData = localStorage.getItem('user');
+        if (userData) {
+          try {
+            setUser(JSON.parse(userData));
+          } catch (e) {
+            // Invalid user data
+            setUser(null);
+          }
+        } else {
+          setUser(null);
         }
       }
-    }
-  }, []);
+    };
 
-  const handleSignOut = () => {
+    // Check on mount
+    checkUser();
+
+    // Listen for storage changes (when user signs in/out in another tab)
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      setUser(null);
-      router.push('/');
+      window.addEventListener('storage', checkUser);
+      return () => window.removeEventListener('storage', checkUser);
     }
-  };
+  }, [pathname]); // Re-check when pathname changes (e.g., after sign in)
 
   const isActive = (path) => pathname === path || pathname?.startsWith(path + '/');
 
-  const navLinks = [
+  // Base nav links (always visible)
+  const baseNavLinks = [
     { href: '/', label: 'Home' },
     { href: '/map', label: 'Map' },
     { href: '/report', label: 'Report' },
     { href: '/leaderboard', label: 'Leaderboard' },
-    { href: '/profile', label: 'Profile' },
   ];
+
+  // Conditional nav links
+  const navLinks = user
+    ? [...baseNavLinks, { href: '/profile', label: 'Profile' }]
+    : baseNavLinks;
 
   return (
     <nav className="bg-white border-b border-gray-200 shadow-sm">
@@ -68,19 +78,7 @@ export default function NavigationBar() {
                 {link.label}
               </Link>
             ))}
-            {user ? (
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-700">
-                  {user.displayName || user.email}
-                </span>
-                <button
-                  onClick={handleSignOut}
-                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600"
-                >
-                  Sign Out
-                </button>
-              </div>
-            ) : (
+            {!user && (
               <Link
                 href="/signin"
                 className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600"
@@ -122,22 +120,7 @@ export default function NavigationBar() {
                 {link.label}
               </Link>
             ))}
-            {user ? (
-              <div className="px-3 py-2">
-                <div className="text-sm text-gray-700 mb-2">
-                  {user.displayName || user.email}
-                </div>
-                <button
-                  onClick={() => {
-                    handleSignOut();
-                    setIsMenuOpen(false);
-                  }}
-                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  Sign Out
-                </button>
-              </div>
-            ) : (
+            {!user && (
               <Link
                 href="/signin"
                 onClick={() => setIsMenuOpen(false)}

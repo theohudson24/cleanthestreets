@@ -1,33 +1,52 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import IssueCard from '@/components/IssueCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import EmptyState from '@/components/EmptyState';
 
 export default function ProfilePage() {
+  const router = useRouter();
   const [user, setUser] = useState(null);
   const [recentReports, setRecentReports] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchProfile();
-  }, []);
+    // Check if user is signed in
+    if (typeof window !== 'undefined') {
+      const userData = localStorage.getItem('user');
+      if (!userData) {
+        // Redirect to sign in if not authenticated
+        router.push('/signin?redirect=/profile');
+        return;
+      }
+      try {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+        fetchProfile();
+      } catch (e) {
+        router.push('/signin?redirect=/profile');
+      }
+    }
+  }, [router]);
+
+  const handleSignOut = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      router.push('/');
+    }
+  };
 
   const fetchProfile = async () => {
     try {
-      // In a real app, this would fetch the current user's profile
-      const response = await fetch('/api/profile');
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data);
-        // Fetch recent reports
-        const reportsResponse = await fetch('/api/reports');
-        if (reportsResponse.ok) {
-          const reports = await reportsResponse.json();
-          setRecentReports(reports.slice(0, 5)); // Last 5 reports
-        }
+      // Fetch recent reports
+      const reportsResponse = await fetch('/api/reports');
+      if (reportsResponse.ok) {
+        const reports = await reportsResponse.json();
+        setRecentReports(reports.slice(0, 5)); // Last 5 reports
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -44,11 +63,15 @@ export default function ProfilePage() {
     );
   }
 
-  const displayUser = user || {
-    displayName: 'User',
-    avatar: null,
-    bio: null,
-    location: null,
+  if (!user) {
+    return null; // Will redirect, so don't render anything
+  }
+
+  const displayUser = {
+    ...user,
+    avatar: user.avatar || null,
+    bio: user.bio || null,
+    location: user.location || null,
     totalReports: recentReports.length,
     fixedRate: 0,
   };
@@ -117,7 +140,7 @@ export default function ProfilePage() {
                 My Reports
               </Link>
               <button
-                onClick={() => alert('Sign out functionality coming soon')}
+                onClick={handleSignOut}
                 className="w-full px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200"
               >
                 Sign Out
