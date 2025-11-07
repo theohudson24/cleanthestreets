@@ -7,6 +7,9 @@ import dynamic from 'next/dynamic';
 import StatusBadge from '@/components/StatusBadge';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import EmptyState from '@/components/EmptyState';
+import XPToast from '@/components/XPToast';
+import { getMockUserProgress } from '@/data/mockUserData';
+import { ACHIEVEMENTS_CATALOG } from '@/data/achievements';
 
 const Map = dynamic(() => import('@/components/Map'), {
   ssr: false,
@@ -19,10 +22,32 @@ export default function IssueDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [userProgress, setUserProgress] = useState(null);
+  const [nextAchievement, setNextAchievement] = useState(null);
+  const [xpToast, setXpToast] = useState(null);
 
   useEffect(() => {
     if (issueId) {
       fetchIssue();
+    }
+    
+    // Load user progress for achievement nudges
+    if (typeof window !== 'undefined') {
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        try {
+          const user = JSON.parse(userData);
+          const progress = getMockUserProgress(user.id);
+          setUserProgress(progress);
+          
+          // Find next unearned achievement
+          const earned = progress.earnedAchievements || [];
+          const next = ACHIEVEMENTS_CATALOG.find(a => !earned.includes(a.id));
+          setNextAchievement(next);
+        } catch (e) {
+          console.error('Error loading user progress:', e);
+        }
+      }
     }
   }, [issueId]);
 
@@ -116,6 +141,15 @@ export default function IssueDetailsPage() {
               Back to Map
             </Link>
           </div>
+          
+          {/* Achievement Nudge */}
+          {nextAchievement && (
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mt-4">
+              <p className="text-sm text-gray-700">
+                <span className="font-semibold">💡 Tip:</span> {nextAchievement.criteria}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Media Gallery */}
@@ -262,6 +296,15 @@ export default function IssueDetailsPage() {
           </div>
         </div>
       </div>
+
+      {/* XP Toast */}
+      {xpToast && (
+        <XPToast
+          message={xpToast.message}
+          amount={xpToast.amount}
+          onClose={() => setXpToast(null)}
+        />
+      )}
     </div>
   );
 }

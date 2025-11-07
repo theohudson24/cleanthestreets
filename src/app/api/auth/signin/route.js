@@ -10,6 +10,7 @@ const TEST_ACCOUNTS = {
       email: 'admin@test.com',
       displayName: 'Admin User',
       role: 'admin',
+      memberSince: '2024-01-15T00:00:00.000Z', // January 15, 2024
     },
   },
   'test@test.com': {
@@ -19,6 +20,7 @@ const TEST_ACCOUNTS = {
       email: 'test@test.com',
       displayName: 'Test User',
       role: 'user',
+      memberSince: '2024-03-20T00:00:00.000Z', // March 20, 2024
     },
   },
 };

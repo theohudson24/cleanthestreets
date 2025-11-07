@@ -15,7 +15,22 @@ export async function GET(request) {
     // 6. Limit to top N
     
     // For MVP, return mock data
+    // Include test accounts for testing
     const leaderboard = [
+      {
+        userId: 'admin-1',
+        displayName: 'Admin User',
+        totalReports: 25,
+        city: 'New York',
+        avatar: null,
+      },
+      {
+        userId: 'user-1',
+        displayName: 'Test User',
+        totalReports: 18,
+        city: 'Los Angeles',
+        avatar: null,
+      },
       {
         userId: '1',
         displayName: 'John Doe',

@@ -38,8 +38,8 @@ export default function SignInPage() {
         localStorage.setItem('token', data.token);
       }
       
-      // Redirect to previous page or default
-      const redirectTo = searchParams?.get('redirect') || '/me/reports';
+      // Redirect to previous page or default to profile
+      const redirectTo = searchParams?.get('redirect') || '/profile';
       router.push(redirectTo);
     } catch (err) {
       setError(err.message || 'An error occurred during sign in.');
