@@ -88,28 +88,43 @@ export default function LeaderboardPage() {
           />
         ) : (
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-white/10">
+              <thead className="bg-slate-900/70">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-200 uppercase tracking-wider">
                     Rank
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-200 uppercase tracking-wider">
                     Name
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Total XP
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-200 uppercase tracking-wider">
+                    Total Reports
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-transparent divide-y divide-white/5">
                 {leaderboard.map((user, index) => {
                   const isCurrentUser = user.userId === currentUserId;
+                  const isPodium = index < 3;
+                  const podiumShadow =
+                    index === 0
+                      ? 'shadow-[0_0_35px_rgba(250,204,21,0.25)] border-amber-300/30'
+                      : index === 1
+                        ? 'shadow-[0_0_35px_rgba(148,163,184,0.25)] border-slate-200/25'
+                        : 'shadow-[0_0_35px_rgba(249,115,22,0.25)] border-orange-300/25';
+                  const rowClass = isPodium
+                    ? `relative bg-slate-900/70 border ${podiumShadow}`
+                    : isCurrentUser
+                      ? 'bg-blue-900/40 border border-blue-400/30'
+                      : 'bg-transparent';
                   return (
-                    <tr key={user.userId} className={index < 3 ? 'bg-yellow-50' : isCurrentUser ? 'bg-blue-50' : ''}>
+                    <tr
+                      key={user.userId}
+                      className={`${rowClass} transition relative overflow-hidden`}
+                    >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <span className="text-lg font-semibold text-gray-900">
+                          <span className={`text-lg font-semibold ${isPodium ? 'text-white' : 'text-gray-900'}`}>
                             #{index + 1}
                           </span>
                           {index === 0 && <span className="ml-2 text-2xl">🥇</span>}
@@ -131,7 +146,7 @@ export default function LeaderboardPage() {
                               {user.displayName || `User ${user.userId}`}
                             </span>
                             {isCurrentUser && user.currentLevel && (
-                              <div className="text-xs text-blue-600 font-semibold mt-1">
+                              <div className="text-xs text-blue-300 font-semibold mt-1">
                                 Level {user.currentLevel}
                               </div>
                             )}
@@ -139,7 +154,7 @@ export default function LeaderboardPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                        {user.totalXP || 0} XP
+                        {user.totalReports ?? 0} reports
                       </td>
                     </tr>
                   );

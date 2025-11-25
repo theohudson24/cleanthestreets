@@ -73,6 +73,7 @@ export const getMockLeaderboard = (period = 'all') => {
       totalXP: 450,
       currentLevel: 3,
       rank: 1,
+      totalReports: 65,
     },
     {
       userId: 'user-1',
@@ -80,6 +81,7 @@ export const getMockLeaderboard = (period = 'all') => {
       totalXP: 180,
       currentLevel: 2,
       rank: 2,
+      totalReports: 38,
     },
     {
       userId: '1',
@@ -87,6 +89,7 @@ export const getMockLeaderboard = (period = 'all') => {
       totalXP: 150,
       currentLevel: 2,
       rank: 3,
+      totalReports: 32,
     },
     {
       userId: '2',
@@ -94,6 +97,7 @@ export const getMockLeaderboard = (period = 'all') => {
       totalXP: 120,
       currentLevel: 1,
       rank: 4,
+      totalReports: 26,
     },
     {
       userId: '3',
@@ -101,7 +105,7 @@ export const getMockLeaderboard = (period = 'all') => {
       totalXP: 80,
       currentLevel: 1,
       rank: 5,
+      totalReports: 19,
     },
   ];
 };
-
