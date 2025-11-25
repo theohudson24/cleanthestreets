@@ -19,7 +19,6 @@ export default function NavigationBar() {
           try {
             setUser(JSON.parse(userData));
           } catch (e) {
-            // Invalid user data
             setUser(null);
           }
         } else {
@@ -54,34 +53,43 @@ export default function NavigationBar() {
     : baseNavLinks;
 
   return (
-    <nav className="bg-white border-b border-gray-200 shadow-sm">
+    <nav className="sticky top-0 z-40 bg-slate-950/70 backdrop-blur border-b border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.4)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold text-gray-900">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="text-lg sm:text-xl font-semibold text-white tracking-tight"
+            >
               CleanTheStreets
             </Link>
+            <span className="hidden sm:inline-flex rounded-full bg-white/5 px-3 py-1 text-[11px] font-semibold text-indigo-100 border border-white/10">
+              Live beta
+            </span>
           </div>
           
           {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-6">
+          <div className="hidden md:flex items-center space-x-3">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold rounded-full transition-all duration-200 ${
                   isActive(link.href)
-                    ? 'text-blue-600 border-b-2 border-blue-600'
-                    : 'text-gray-700 hover:text-blue-600'
+                    ? 'text-white bg-gradient-to-r from-indigo-500 to-blue-500 shadow-[0_10px_25px_rgba(37,99,235,0.35)]'
+                    : 'text-slate-200 hover:text-white hover:bg-white/5 hover:shadow-[0_10px_25px_rgba(59,130,246,0.25)]'
                 }`}
               >
                 {link.label}
+                {!isActive(link.href) && (
+                  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-500/0 via-blue-500/0 to-cyan-400/0 opacity-0 blur-md transition hover:opacity-50" />
+                )}
               </Link>
             ))}
             {!user && (
               <Link
                 href="/signin"
-                className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600"
+                className="inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-200 rounded-full border border-white/10 hover:text-white hover:border-blue-400/50 transition"
               >
                 Sign In
               </Link>
@@ -91,7 +99,7 @@ export default function NavigationBar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden text-gray-700 hover:text-blue-600"
+            className="md:hidden text-slate-200 hover:text-white"
           >
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               {isMenuOpen ? (
@@ -111,10 +119,10 @@ export default function NavigationBar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsMenuOpen(false)}
-                className={`block px-3 py-2 rounded-md text-base font-medium ${
+                className={`block px-3 py-2 rounded-full text-base font-semibold transition ${
                   isActive(link.href)
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-gray-700 hover:bg-gray-50'
+                    ? 'text-white bg-gradient-to-r from-indigo-500 to-blue-500 shadow-[0_12px_30px_rgba(37,99,235,0.35)]'
+                    : 'text-slate-200 bg-white/5 border border-white/5 hover:border-blue-400/40'
                 }`}
               >
                 {link.label}
@@ -124,7 +132,7 @@ export default function NavigationBar() {
               <Link
                 href="/signin"
                 onClick={() => setIsMenuOpen(false)}
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
+                className="block px-3 py-2 rounded-full text-base font-semibold text-slate-200 bg-white/5 border border-white/5 hover:border-blue-400/40 transition"
               >
                 Sign In
               </Link>
@@ -135,4 +143,3 @@ export default function NavigationBar() {
     </nav>
   );
 }
-
