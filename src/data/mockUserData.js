@@ -5,10 +5,10 @@ export const getMockUserProgress = (userId) => {
   // Different data for different users
   const userData = {
     'admin-1': {
-      totalXP: 450,
+      totalXP: 100,
       currentLevel: 3,
       xpToNextLevel: 150,
-      xpForCurrentLevel: 300,
+      xpForCurrentLevel: 0,
       reportStats: {
         reported: 15,
         in_progress: 5,
