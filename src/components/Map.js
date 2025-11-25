@@ -5,6 +5,12 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaf
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
+const APPLE_INSPIRED_BASEMAP = {
+  url: 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png',
+  attribution:
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a>',
+};
+
 // Fix for default marker icons in Next.js
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -92,8 +98,8 @@ export default function Map({ reports = [], onMarkerClick, onMapClick, center: p
         className="z-0"
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution={APPLE_INSPIRED_BASEMAP.attribution}
+          url={APPLE_INSPIRED_BASEMAP.url}
         />
         {onMapClick && <MapClickHandler onMapClick={onMapClick} />}
         {reports.map((report) => (
@@ -139,4 +145,3 @@ export default function Map({ reports = [], onMarkerClick, onMapClick, center: p
     </div>
   );
 }
-
