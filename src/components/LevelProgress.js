@@ -29,7 +29,7 @@ export default function LevelProgress({ level, currentXP, xpForCurrentLevel, xpT
       <div className="flex-1 min-w-[200px]">
         <div className="w-full bg-gray-200 rounded-full h-2.5 mb-1">
           <div
-            className="bg-blue-600 h-2.5 rounded-full transition-all duration-1000 ease-out"
+            className="bg-green-500 h-2.5 rounded-full transition-all duration-1000 ease-out"
             style={{ width: `${animatedProgress}%` }}
             role="progressbar"
             aria-valuenow={displayPercent}
@@ -45,4 +45,3 @@ export default function LevelProgress({ level, currentXP, xpForCurrentLevel, xpT
     </div>
   );
 }
-

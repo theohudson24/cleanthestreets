@@ -40,7 +40,7 @@ export default function ProfilePage() {
         // Load mock user progress data
         const progress = getMockUserProgress(parsedUser.id);
         setUserProgress(progress);
-        fetchProfile(parsedUser);
+        fetchProfile(parsedUser, progress);
       } catch (e) {
         router.push('/signin?redirect=/profile');
       }
@@ -63,13 +63,22 @@ export default function ProfilePage() {
     setShowSignOutConfirm(false);
   };
 
-  const fetchProfile = async (currentUser) => {
+  const fetchProfile = async (currentUser, progressData) => {
     try {
+      const xpSource = progressData || userProgress;
       // Fetch recent reports
       const reportsResponse = await fetch('/api/reports');
       if (reportsResponse.ok) {
         const reports = await reportsResponse.json();
-        setRecentReports(reports.slice(0, 5)); // Last 5 reports
+        const recentReportsWithXP = reports.slice(0, 5).map((report, index) => {
+          const xpEvent = xpSource?.recentXPEvents?.[index];
+          return {
+            ...report,
+            xpEarned: xpEvent?.amount ?? null,
+            xpLabel: xpEvent?.label ?? null,
+          };
+        });
+        setRecentReports(recentReportsWithXP); // Last 5 reports with XP context
       }
 
       // Fetch leaderboard to find user's position
@@ -341,13 +350,20 @@ export default function ProfilePage() {
                         href={`/issue/${report.id}`}
                         className="block text-xs text-gray-600 hover:text-blue-600 transition-colors"
                       >
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between gap-2">
                           <span className="truncate flex-1">
                             {report.issueType?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'Issue'}
                           </span>
-                          <span className="text-gray-400 ml-2">
-                            {new Date(report.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            {typeof report.xpEarned === 'number' && (
+                              <span className="text-green-600 font-semibold">
+                                +{report.xpEarned} XP
+                              </span>
+                            )}
+                            <span className="text-gray-400">
+                              {new Date(report.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </span>
+                          </div>
                         </div>
                       </Link>
                     ))}
@@ -399,20 +415,6 @@ export default function ProfilePage() {
           )}
         </div>
 
-        {/* Recent XP Events */}
-        {userProgress && userProgress.recentXPEvents.length > 0 && (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent XP</h2>
-            <div className="space-y-2">
-              {userProgress.recentXPEvents.slice(0, 3).map((event, index) => (
-                <div key={index} className="flex items-center justify-between text-sm">
-                  <span className="text-gray-700">{event.label}</span>
-                  <span className="font-semibold text-green-600">+{event.amount} XP</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* XP Toast */}
@@ -460,4 +462,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-

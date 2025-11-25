@@ -35,10 +35,30 @@ export const ACHIEVEMENTS_CATALOG = [
     icon: '📸',
     criteria: 'Submit 10 reports with photos',
   },
+  {
+    id: 'urban_explorer',
+    title: 'Urban Explorer',
+    description: 'You\'ve reported hazards in three different neighborhoods.',
+    icon: '🧭',
+    criteria: 'Report issues in 3 unique neighborhoods',
+  },
+  {
+    id: 'community_builder',
+    title: 'Community Builder',
+    description: 'You’ve helped validate ten community reports.',
+    icon: '🤝',
+    criteria: 'Validate 10 reports from other residents',
+  },
+  {
+    id: 'rapid_responder',
+    title: 'Rapid Responder',
+    description: 'You filed a report within minutes of spotting the hazard.',
+    icon: '⚡️',
+    criteria: 'Submit a report within 15 minutes of observing an issue',
+  },
 ];
 
 // Helper function to get achievement by ID
 export const getAchievementById = (id) => {
   return ACHIEVEMENTS_CATALOG.find(achievement => achievement.id === id);
 };
-

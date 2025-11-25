@@ -37,10 +37,17 @@ export default function IssueCard({ issue }) {
                 <span>Severity: {issue.severity}/5</span>
               )}
             </div>
+            {typeof issue.xpEarned === 'number' && (
+              <div className="flex items-center justify-between mt-3 text-xs">
+                <span className="text-gray-500">
+                  {issue.xpLabel || 'XP earned'}
+                </span>
+                <span className="text-green-600 font-semibold">+{issue.xpEarned} XP</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </Link>
   );
 }
-
