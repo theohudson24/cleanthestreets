@@ -82,11 +82,11 @@ export default function MapPage() {
     let filtered = [...reports];
 
     if (categoryFilter.length > 0) {
-      filtered = filtered.filter(r => categoryFilter.includes(r.issueType));
+      filtered = filtered.filter((r) => categoryFilter.includes(r.issueType));
     }
 
     if (statusFilter.length > 0) {
-      filtered = filtered.filter(r => statusFilter.includes(r.status));
+      filtered = filtered.filter((r) => statusFilter.includes(r.status));
     }
 
     setFilteredReports(filtered);
@@ -112,83 +112,103 @@ export default function MapPage() {
   const hasActiveFilters = categoryFilter.length > 0 || statusFilter.length > 0;
 
   return (
-    <div className="relative h-screen">
+    <div className="relative h-screen bg-slate-950">
       {/* Map Controls */}
-      <div className="absolute top-4 left-4 right-4 z-[1000] flex flex-col gap-4">
-        {/* Search */}
-        <div className="bg-white rounded-lg shadow-lg p-4 max-w-md">
-          <form onSubmit={handleSearch} className="flex gap-2">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search address or place..."
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              Search
-            </button>
-          </form>
-        </div>
-
-        {/* Filters */}
-        <div className="bg-white rounded-lg shadow-lg p-4 max-w-2xl">
-          <div className="mb-3">
-            <h3 className="text-sm font-semibold text-gray-700 mb-2">Category</h3>
-            <FilterChips
-              filters={categoryFilter}
-              onFilterChange={(value) => {
-                setCategoryFilter(
-                  categoryFilter.includes(value)
-                    ? categoryFilter.filter(f => f !== value)
-                    : [...categoryFilter, value]
-                );
-              }}
-              options={categoryOptions}
-            />
-          </div>
-          <div className="mb-3">
-            <h3 className="text-sm font-semibold text-gray-700 mb-2">Status</h3>
-            <FilterChips
-              filters={statusFilter}
-              onFilterChange={(value) => {
-                setStatusFilter(
-                  statusFilter.includes(value)
-                    ? statusFilter.filter(f => f !== value)
-                    : [...statusFilter, value]
-                );
-              }}
-              options={statusOptions}
-            />
-          </div>
-          {hasActiveFilters && (
-            <button
-              onClick={clearFilters}
-              className="text-sm text-blue-600 hover:text-blue-800"
-            >
-              Clear Filters
-            </button>
-          )}
-        </div>
-
-        {/* Legend */}
-        <div className="bg-white rounded-lg shadow-lg p-4 max-w-xs">
-          <h3 className="text-sm font-semibold text-gray-700 mb-2">Status Legend</h3>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-blue-500 rounded"></div>
-              <span className="text-sm text-gray-600">Reported</span>
+      <div className="absolute top-4 right-4 z-[1000] pointer-events-none">
+        <div className="pointer-events-auto space-y-3 w-[min(440px,calc(100vw-2rem))] sm:w-[min(480px,calc(100vw-3rem))]">
+          {/* Search */}
+          <div className="rounded-2xl border border-white/10 bg-slate-900/80 shadow-[0_20px_60px_rgba(0,0,0,0.55)] backdrop-blur-xl">
+            <div className="flex items-center justify-between px-4 py-3">
+              <div>
+                <p className="text-[13px] font-semibold text-slate-50">Find a location</p>
+                <p className="text-xs text-slate-400">Search or pan the map to explore.</p>
+              </div>
+              <span className="rounded-full bg-white/5 px-3 py-1 text-[11px] font-medium text-slate-200 border border-white/10">
+                Live
+              </span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-yellow-500 rounded"></div>
-              <span className="text-sm text-gray-600">In Progress</span>
+            <div className="px-4 pb-4">
+              <form onSubmit={handleSearch} className="flex gap-2 items-center">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search address or place…"
+                  className="flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-400/60 focus:border-indigo-200"
+                />
+                <button
+                  type="submit"
+                  className="rounded-xl bg-gradient-to-r from-indigo-500 to-blue-500 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-indigo-500/25 hover:brightness-105"
+                >
+                  Search
+                </button>
+              </form>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-green-500 rounded"></div>
-              <span className="text-sm text-gray-600">Fixed</span>
+          </div>
+
+          {/* Filters */}
+          <div className="rounded-2xl border border-white/10 bg-slate-900/75 shadow-[0_18px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+            <div className="flex items-center justify-between px-4 pt-4">
+              <p className="text-[13px] font-semibold text-slate-50">Filter reports</p>
+              {hasActiveFilters && (
+                <button
+                  onClick={clearFilters}
+                  className="text-[11px] font-semibold text-indigo-200 hover:text-white"
+                >
+                  Reset
+                </button>
+              )}
+            </div>
+            <div className="px-4 pb-4 space-y-4">
+              <div>
+                <div className="text-[11px] uppercase tracking-wide text-slate-400 mb-2">Category</div>
+                <FilterChips
+                  filters={categoryFilter}
+                  onFilterChange={(value) => {
+                    setCategoryFilter(
+                      categoryFilter.includes(value)
+                        ? categoryFilter.filter((f) => f !== value)
+                        : [...categoryFilter, value]
+                    );
+                  }}
+                  options={categoryOptions}
+                  variant="linear"
+                />
+              </div>
+              <div>
+                <div className="text-[11px] uppercase tracking-wide text-slate-400 mb-2">Status</div>
+                <FilterChips
+                  filters={statusFilter}
+                  onFilterChange={(value) => {
+                    setStatusFilter(
+                      statusFilter.includes(value)
+                        ? statusFilter.filter((f) => f !== value)
+                        : [...statusFilter, value]
+                    );
+                  }}
+                  options={statusOptions}
+                  variant="linear"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Legend */}
+          <div className="rounded-xl border border-white/10 bg-slate-900/70 shadow-lg shadow-black/50 backdrop-blur-xl px-4 py-3 text-slate-100">
+            <h3 className="text-xs font-semibold mb-2 text-slate-200">Status legend</h3>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-blue-400" />
+                <span className="text-xs text-slate-300">Reported</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-amber-400" />
+                <span className="text-xs text-slate-300">In Progress</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-emerald-400" />
+                <span className="text-xs text-slate-300">Fixed</span>
+              </div>
             </div>
           </div>
         </div>
@@ -196,14 +216,17 @@ export default function MapPage() {
 
       {/* Error Toast */}
       {error && (
-        <div className="absolute bottom-4 left-4 right-4 z-[1000] bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded shadow-lg">
-          Error loading reports: {error}
-          <button
-            onClick={() => setError(null)}
-            className="ml-4 text-red-800 hover:text-red-900"
-          >
-            ×
-          </button>
+        <div className="absolute bottom-4 right-4 z-[1000]">
+          <div className="bg-rose-500/90 text-white border border-white/15 px-4 py-3 rounded-xl shadow-xl shadow-rose-500/30 flex items-center gap-3">
+            <span className="text-sm font-semibold">Error loading reports:</span>
+            <span className="text-sm">{error}</span>
+            <button
+              onClick={() => setError(null)}
+              className="ml-2 text-white/80 hover:text-white"
+            >
+              ×
+            </button>
+          </div>
         </div>
       )}
 
@@ -215,7 +238,7 @@ export default function MapPage() {
             description="Try adjusting your filters to see more reports."
             actionLabel="Clear Filters"
             actionHref="#"
-            icon={<button onClick={clearFilters} className="text-blue-600">Clear Filters</button>}
+            icon={<button onClick={clearFilters} className="text-indigo-300 hover:text-white">Clear Filters</button>}
           />
         </div>
       )}
