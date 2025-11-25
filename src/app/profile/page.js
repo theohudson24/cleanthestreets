@@ -179,18 +179,19 @@ export default function ProfilePage() {
             <div className="flex-1">
               <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-2 gap-4">
                 <div className="flex-1">
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  <h1 className="text-3xl font-bold text-gray-900 mb-1">
                     {displayUser.displayName || 'User'}
                   </h1>
-                  {/* Level Progress Header */}
                   {userProgress && (
-                    <LevelProgress
-                      level={userProgress.currentLevel}
-                      currentXP={userProgress.totalXP}
-                      xpForCurrentLevel={userProgress.xpForCurrentLevel}
-                      xpToNextLevel={userProgress.xpToNextLevel}
-                      animate={true}
-                    />
+                    <p className="text-sm text-gray-600 mb-1">
+                      <span className="font-medium">Level:</span> {userProgress.currentLevel}
+                    </p>
+                  )}
+                  {memberInfo && (
+                    <p className="text-sm text-gray-600">
+                      <span className="font-medium">Member since:</span>{' '}
+                      {memberInfo.formattedDate}
+                    </p>
                   )}
                 </div>
                 <button
@@ -200,17 +201,7 @@ export default function ProfilePage() {
                   {isEditing ? 'Cancel' : 'Edit Profile'}
                 </button>
               </div>
-              {memberInfo && (
-                <div className="mb-3">
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium">Member since:</span>{' '}
-                    {memberInfo.formattedDate}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Member for {memberInfo.timeAgo}
-                  </p>
-                </div>
-              )}
+              
               {isEditing ? (
                 <div className="mt-4 space-y-4">
                   <div>
@@ -330,6 +321,17 @@ export default function ProfilePage() {
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Account</h2>
             <div className="space-y-3">
+              {userProgress && (
+                <div className="bg-slate-900/40 border border-white/10 rounded-xl p-4">
+                  <LevelProgress
+                    level={userProgress.currentLevel}
+                    currentXP={userProgress.totalXP}
+                    xpForCurrentLevel={userProgress.xpForCurrentLevel}
+                    xpToNextLevel={userProgress.xpToNextLevel}
+                    animate={true}
+                  />
+                </div>
+              )}
               <Link
                 href="/me/reports"
                 className="block px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
@@ -381,7 +383,7 @@ export default function ProfilePage() {
               
               <button
                 onClick={confirmSignOut}
-                className="w-full px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 mt-4"
+                className="w-full px-4 py-2 bg-red-900/70 text-red-100 border border-red-500/40 rounded-md hover:bg-red-900 mt-4 transition-colors"
               >
                 Sign Out
               </button>
