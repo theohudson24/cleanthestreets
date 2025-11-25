@@ -160,7 +160,7 @@ export default function ProfilePage() {
   const memberInfo = displayUser.memberSince ? formatMemberSince(displayUser.memberSince) : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900 text-slate-100">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">

@@ -9,7 +9,7 @@ export default function Error({ error, reset }) {
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center px-4 py-16">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900 flex items-center justify-center px-4 py-16 text-slate-100">
       <div className="max-w-2xl mx-auto text-center">
         <h1 className="text-6xl font-bold text-gray-900 mb-4">500</h1>
         <h2 className="text-3xl font-semibold text-gray-900 mb-4">Something Went Wrong</h2>
@@ -34,4 +34,3 @@ export default function Error({ error, reset }) {
     </div>
   );
 }
-

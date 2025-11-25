@@ -94,7 +94,7 @@ export default function IssueDetailsPage() {
 
   if (error === 'not_found') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900 text-slate-100">
         <div className="max-w-2xl mx-auto px-4 py-16 text-center">
           <EmptyState
             title="Report Not Found"
@@ -109,7 +109,7 @@ export default function IssueDetailsPage() {
 
   if (error || !issue) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900 text-slate-100">
         <div className="max-w-2xl mx-auto px-4 py-16 text-center">
           <EmptyState
             title="Error Loading Report"
@@ -123,7 +123,7 @@ export default function IssueDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900 text-slate-100">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -308,4 +308,3 @@ export default function IssueDetailsPage() {
     </div>
   );
 }
-

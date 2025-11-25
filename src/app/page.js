@@ -47,7 +47,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50 to-blue-50 text-slate-900">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900 text-slate-100">
       {/* main content sits under your existing global navbar */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Main layout: hero + stats card */}
@@ -193,7 +193,7 @@ export default function Home() {
 
             <div className="relative mt-4">
               {/* connector line (desktop) */}
-              <div className="hidden sm:block absolute left-[12%] right-[12%] top-6 h-px bg-gradient-to-r from-slate-100 via-slate-200 to-slate-100" />
+              <div className="hidden sm:block absolute left-[12%] right-[12%] top-6 h-px bg-gradient-to-r from-white/10 via-white/20 to-white/10" />
 
               <div className="grid gap-8 sm:grid-cols-3">
                 {/* Step 1 */}

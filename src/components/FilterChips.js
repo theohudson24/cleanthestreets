@@ -13,9 +13,11 @@ export default function FilterChips({ filters, onFilterChange, options, variant 
         }
       : {
           container: 'flex flex-wrap gap-2',
-          active: 'bg-blue-600 text-white',
-          inactive: 'bg-gray-100 text-gray-700 hover:bg-gray-200',
-          base: 'px-4 py-2 rounded-full text-sm font-medium transition-colors',
+          active:
+            'bg-gradient-to-r from-indigo-500 to-blue-500 text-white border border-white/10 shadow-md shadow-indigo-500/30',
+          inactive:
+            'glass-chip hover:border-indigo-400/80 hover:text-white hover:bg-indigo-950/30 transition-all',
+          base: 'px-4 py-2 rounded-full text-sm font-medium transition-all',
         };
 
   return (

@@ -71,7 +71,7 @@ export default function ReportSuccessPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900 text-slate-100">
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -150,4 +150,3 @@ export default function ReportSuccessPage() {
     </div>
   );
 }
-

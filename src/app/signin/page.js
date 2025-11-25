@@ -49,7 +49,7 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900 flex items-center justify-center px-4 py-12 text-slate-100">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">Sign In</h1>
 
@@ -129,4 +129,3 @@ export default function SignInPage() {
     </div>
   );
 }
-
