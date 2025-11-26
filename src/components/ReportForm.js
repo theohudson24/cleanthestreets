@@ -30,6 +30,28 @@ export default function ReportForm() {
   const [uploadProgress, setUploadProgress] = useState({});
   const [showMap, setShowMap] = useState(false);
   const [mapCenter, setMapCenter] = useState([40.7128, -74.0060]);
+  const centerOnCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setMapCenter([position.coords.latitude, position.coords.longitude]);
+        },
+        () => {
+          // fall back silently
+        }
+      );
+    }
+  };
+
+  const toggleMap = () => {
+    const nextShow = !showMap;
+    setShowMap(nextShow);
+    if (!showMap && formData.latitude && formData.longitude) {
+      setMapCenter([formData.latitude, formData.longitude]);
+    } else if (!showMap && (!formData.latitude || !formData.longitude)) {
+      centerOnCurrentLocation();
+    }
+  };
 
   // Get user's location
   const getLocation = () => {
@@ -176,7 +198,18 @@ export default function ReportForm() {
             <div className="flex items-center gap-4">
               <button
                 type="button"
-                onClick={getLocation}
+                onClick={() => {
+                  if (locationStatus === 'success') {
+                    setFormData({
+                      ...formData,
+                      latitude: null,
+                      longitude: null,
+                    });
+                    setLocationStatus('pending');
+                  } else {
+                    getLocation();
+                  }
+                }}
                 disabled={locationStatus === 'loading'}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -194,8 +227,12 @@ export default function ReportForm() {
               
               <button
                 type="button"
-                onClick={() => setShowMap(!showMap)}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                onClick={toggleMap}
+                className={`px-4 py-2 rounded-md shadow-sm font-semibold transition-colors ${
+                  showMap
+                    ? 'bg-gradient-to-r from-red-600 to-rose-500 text-white shadow-[0_10px_25px_rgba(239,68,68,0.4)] hover:brightness-110'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
               >
                 {showMap ? 'Hide Map' : 'Choose on Map'}
               </button>
@@ -204,6 +241,7 @@ export default function ReportForm() {
             {showMap && (
               <div className="h-64 border border-gray-300 rounded-md overflow-hidden">
                 <Map
+                  key={`${formData.latitude ?? 'lat'}-${formData.longitude ?? 'lng'}-${showMap}`}
                   reports={[]}
                   center={mapCenter}
                   onMapClick={handleMapClick}
@@ -278,23 +316,35 @@ export default function ReportForm() {
             </div>
 
             <div>
-              <label htmlFor="severity" className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Severity (1-5) *
               </label>
-              <div className="flex items-center gap-4">
-                <input
-                  type="range"
-                  id="severity"
-                  min="1"
-                  max="5"
-                  value={formData.severity}
-                  onChange={(e) => setFormData({ ...formData, severity: parseInt(e.target.value) })}
-                  className="flex-1"
-                  required
-                />
-                <span className="text-lg font-semibold text-gray-900 w-8 text-center">
-                  {formData.severity}
-                </span>
+              <div className="flex items-center gap-3">
+                {[1, 2, 3, 4, 5].map((value) => {
+                  const isActive = formData.severity >= value;
+                  const colors = [
+                    'from-emerald-500 to-lime-400 border-emerald-200',
+                    'from-lime-500 to-amber-400 border-lime-200',
+                    'from-amber-500 to-orange-400 border-amber-200',
+                    'from-orange-500 to-red-400 border-orange-200',
+                    'from-red-500 to-rose-500 border-red-200',
+                  ];
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, severity: value })}
+                      className={`h-10 w-10 rounded-lg border transition-all ${
+                        isActive
+                          ? `bg-gradient-to-br ${colors[value - 1]} shadow-lg shadow-black/30 text-white`
+                          : 'bg-gray-200/40 border-gray-400/20 text-gray-500'
+                      }`}
+                      aria-label={`Set severity ${value}`}
+                    >
+                      {value}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
