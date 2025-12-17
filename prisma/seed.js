@@ -2,6 +2,7 @@
 // Loads .env.local and constructs PrismaClient explicitly to avoid mixed ESM/CJS issues
 const dotenv = require("dotenv");
 const path = require("path");
+const bcrypt = require("bcryptjs");
 const { PrismaClient } = require("@prisma/client");
 
 // Load .env.local first so it overrides shared .env
@@ -11,23 +12,35 @@ dotenv.config();
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.user.create({
-    data: {
+  // Ensure the test user exists and the password is set (idempotent)
+  await prisma.user.upsert({
+    where: { email: "test@test.com" },
+    update: {
+      passwordHash: bcrypt.hashSync("changeme", 10),
+      displayName: "Test User",
+    },
+    create: {
       email: "test@test.com",
-      passwordHash: "changeme",
+      passwordHash: bcrypt.hashSync("changeme", 10),
       displayName: "Test User",
     },
   });
 
-  await prisma.report.create({
-    data: {
-      issueType: "pothole",
-      description: "Seeded pothole",
-      latitude: 40.7128,
-      longitude: -74.006,
-      severity: 2,
-    },
+  // Create a sample report if one with the same description doesn't already exist
+  const existingReport = await prisma.report.findFirst({
+    where: { description: "Seeded pothole" },
   });
+  if (!existingReport) {
+    await prisma.report.create({
+      data: {
+        issueType: "pothole",
+        description: "Seeded pothole",
+        latitude: 40.7128,
+        longitude: -74.006,
+        severity: 2,
+      },
+    });
+  }
 
   console.log("✅ Seed complete");
 }

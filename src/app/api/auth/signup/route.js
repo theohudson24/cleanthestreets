@@ -1,21 +1,12 @@
-// API route for sign up (demo stub — implement DB-backed user creation and password hashing before production)
-// In a real application, this would create a new user account
+import prisma from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
+// Sign up route — creates a new user in the database with a hashed password
 export async function POST(request) {
   try {
     const body = await request.json();
     const { email, password, displayName } = body;
 
-    // In a real app, this would:
-    // 1. Validate email format
-    // 2. Check if email already exists
-    // 3. Validate password strength
-    // 4. Hash password
-    // 5. Create user in database
-    // 6. Create session/token
-    // 7. Return user data and token
-
-    // For MVP, return success (actual signup would be implemented later)
     if (!email || !password || !displayName) {
       return Response.json(
         { error: "Email, password, and display name are required" },
@@ -30,15 +21,23 @@ export async function POST(request) {
       );
     }
 
-    // Mock successful sign up
-    return Response.json({
-      user: {
-        id: "1",
-        email: email,
-        displayName: displayName,
-      },
-      token: "mock-token",
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing) {
+      return Response.json({ error: "Email already in use" }, { status: 409 });
+    }
+
+    const passwordHash = bcrypt.hashSync(password, 10);
+
+    const user = await prisma.user.create({
+      data: { email, passwordHash, displayName },
     });
+
+    const { passwordHash: _ph, ...safeUser } = user;
+
+    return Response.json(
+      { user: safeUser, token: `mock-token-${user.id}` },
+      { status: 201 }
+    );
   } catch (error) {
     return Response.json({ error: "Sign up failed" }, { status: 500 });
   }
