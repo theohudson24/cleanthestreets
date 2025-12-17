@@ -1,0 +1,42 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  displayName  String
+  role         String   @default("user")
+  createdAt    DateTime @default(now())
+  reports      Report[]
+}
+
+model Report {
+  id          Int         @id @default(autoincrement())
+  userId      String?
+  user        User?       @relation(fields: [userId], references: [id])
+  issueType   String
+  description String?
+  latitude    Float
+  longitude   Float
+  status      String      @default("reported")
+  severity    Int         @default(1)
+  address     String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  images      ReportImage[]
+}
+
+model ReportImage {
+  id        Int      @id @default(autoincrement())
+  reportId  Int
+  url       String
+  createdAt DateTime @default(now())
+  report    Report   @relation(fields: [reportId], references: [id])
+}

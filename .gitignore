@@ -39,3 +39,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma
+
+# Local env files (already covered by .env* but add explicit ignores)
+.env.local
+.env.*.local
+.env.test
+
+# Docker credentials and local runtime secrets
+.docker
+
+# Prisma client and migrations cache (migrations are normally committed; keep cache ignored)
+node_modules/.prisma
+

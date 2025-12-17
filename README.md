@@ -32,20 +32,36 @@ npm install
    - Create a new unsigned upload preset named `cleanthestreets`
    - Copy your Cloud Name from the dashboard
 
-3. Create a `.env.local` file in the root directory:
+3. Create a `.env.local` file in the root directory by copying `.env.example` and filling in local values (DO NOT commit `.env.local`):
 
-```env
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloud-name
-NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=cleanthestreets
+```bash
+cp .env.example .env.local
+# then edit .env.local to set values such as DATABASE_URL
 ```
 
-4. Run the development server:
+4. Start the local Postgres database (Docker Compose):
+
+```bash
+npm run db:up
+```
+
+5. Test the DB connection and apply Prisma migrations (first-time setup):
+
+```bash
+npm run db:test       # checks the DATABASE_URL can connect
+npx prisma generate
+npx prisma migrate dev --name init
+npm run prisma:seed   # optional: seed sample data
+npx prisma studio     # inspect data in a GUI
+```
+
+6. Run the development server:
 
 ```bash
 npm run dev
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+7. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Project Structure
 
@@ -69,7 +85,7 @@ src/
 ## Usage
 
 1. **View the Map**: Navigate to `/map` to see all reported issues
-2. **Report an Issue**: 
+2. **Report an Issue**:
    - Go to `/report`
    - Fill out the form with issue type, description, and optional photo
    - Click "Capture My Location" or allow browser location access
@@ -79,10 +95,11 @@ src/
 ## API Routes
 
 The app includes API routes at `/api/reports`:
+
 - `GET /api/reports` - Fetch all reports
 - `POST /api/reports` - Create a new report
 
-**Note**: The current implementation uses in-memory storage. For production, connect to a database.
+**Note**: The API is now backed by **Postgres + Prisma** for persistent storage in local development. See the "Database (Postgres + Prisma)" steps above to set up a local database. For production, configure a managed Postgres instance and set `DATABASE_URL` accordingly.
 
 ## Technologies
 
@@ -91,12 +108,26 @@ The app includes API routes at `/api/reports`:
 - **Leaflet.js** - Interactive maps
 - **Tailwind CSS** - Styling
 - **Cloudinary** - Image hosting
+- **Postgres + Prisma** - Local database and ORM for persistent storage (dev)
 
 ## Learn More
 
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Leaflet.js Documentation](https://leafletjs.com/)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+
+## Security & Secrets ⚠️
+
+- Keep any real credentials out of the repository. Create a local `.env.local` from `.env.example` and never commit it.
+- If you accidentally committed a `.env` file with secrets, remove it from the repository history or at minimum untrack it locally:
+
+```bash
+# stop tracking the file (keeps the file locally)
+git rm --cached .env
+git commit -m "remove tracked .env"
+```
+
+- Make sure `.env*` and other local runtime files are ignored (this repo already includes `.env*` patterns in `.gitignore`).
 
 ## Deploy on Vercel
 
