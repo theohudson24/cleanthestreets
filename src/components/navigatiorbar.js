@@ -63,9 +63,6 @@ export default function NavigationBar() {
             >
               CleanTheStreets
             </Link>
-            <span className="hidden sm:inline-flex rounded-full bg-gradient-to-r from-red-600/80 to-rose-500/80 px-3 py-1 text-[11px] font-semibold text-white border border-red-300/40 shadow-[0_0_15px_rgba(248,113,113,0.6)]">
-              Live beta
-            </span>
           </div>
           
           {/* Desktop Navigation */}
