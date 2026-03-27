@@ -61,8 +61,8 @@ export default function SignInPage() {
         <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
           <p className="text-sm font-semibold text-blue-900 mb-2">Test Accounts (for testing):</p>
           <div className="text-xs text-blue-800 space-y-1">
-            <p><strong>Admin:</strong> admin@test.com / admin123</p>
-            <p><strong>User:</strong> test@test.com / test123</p>
+            <p><strong>Admin:</strong> admin@test.com / admin12345</p>
+            <p><strong>User:</strong> test@test.com / test12345</p>
           </div>
         </div>
 

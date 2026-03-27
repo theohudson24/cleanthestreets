@@ -7,30 +7,57 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum UserRole {
+  user
+  admin
+}
+
+enum IssueType {
+  pothole
+  damaged_road
+  debris
+  signage
+  other
+}
+
+enum ReportStatus {
+  reported
+  in_progress
+  fixed
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
   passwordHash String
   displayName  String
-  role         String   @default("user")
+  avatarUrl    String?
+  bio          String?
+  location     String?
+  role         UserRole @default(user)
   createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
   reports      Report[]
 }
 
 model Report {
-  id          Int         @id @default(autoincrement())
+  id          Int          @id @default(autoincrement())
   userId      String?
-  user        User?       @relation(fields: [userId], references: [id])
-  issueType   String
+  user        User?        @relation(fields: [userId], references: [id])
+  issueType   IssueType
   description String?
   latitude    Float
   longitude   Float
-  status      String      @default("reported")
-  severity    Int         @default(1)
+  status      ReportStatus @default(reported)
+  severity    Int          @default(1)
   address     String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   images      ReportImage[]
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+  @@index([issueType, createdAt])
 }
 
 model ReportImage {

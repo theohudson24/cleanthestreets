@@ -20,7 +20,7 @@ dotenv.config();
     console.log("user found: id=" + u.id + ", email=" + u.email);
     console.log(
       "password valid?",
-      bcrypt.compareSync("changeme", u.passwordHash)
+      bcrypt.compareSync("test12345", u.passwordHash)
     );
   } catch (err) {
     console.error("error:", err);

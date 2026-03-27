@@ -12,17 +12,40 @@ dotenv.config();
 const prisma = new PrismaClient();
 
 async function main() {
-  // Ensure the test user exists and the password is set (idempotent)
+  // Ensure the test users exist and passwords are set (idempotent)
   await prisma.user.upsert({
     where: { email: "test@test.com" },
     update: {
-      passwordHash: bcrypt.hashSync("changeme", 10),
+      passwordHash: bcrypt.hashSync("test12345", 10),
       displayName: "Test User",
+      bio: "Neighborhood issue reporter",
+      location: "Los Angeles, CA",
     },
     create: {
       email: "test@test.com",
-      passwordHash: bcrypt.hashSync("changeme", 10),
+      passwordHash: bcrypt.hashSync("test12345", 10),
       displayName: "Test User",
+      bio: "Neighborhood issue reporter",
+      location: "Los Angeles, CA",
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email: "admin@test.com" },
+    update: {
+      passwordHash: bcrypt.hashSync("admin12345", 10),
+      displayName: "Admin User",
+      role: "admin",
+      bio: "Community moderation account",
+      location: "New York, NY",
+    },
+    create: {
+      email: "admin@test.com",
+      passwordHash: bcrypt.hashSync("admin12345", 10),
+      displayName: "Admin User",
+      role: "admin",
+      bio: "Community moderation account",
+      location: "New York, NY",
     },
   });
 
@@ -31,8 +54,14 @@ async function main() {
     where: { description: "Seeded pothole" },
   });
   if (!existingReport) {
+    const testUser = await prisma.user.findUnique({
+      where: { email: "test@test.com" },
+      select: { id: true },
+    });
+
     await prisma.report.create({
       data: {
+        userId: testUser?.id,
         issueType: "pothole",
         description: "Seeded pothole",
         latitude: 40.7128,
