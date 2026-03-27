@@ -22,7 +22,7 @@ export default function LevelUpToast({ level, onClose, duration = 5000 }) {
       <div className="bg-white rounded-lg shadow-2xl p-8 text-center pointer-events-auto">
         <div className="text-6xl mb-4">🎉</div>
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Level Up!</h2>
-        <p className="text-xl text-gray-600 mb-4">You've reached Level {level}</p>
+        <p className="text-xl text-gray-600 mb-4">You&apos;ve reached Level {level}</p>
         <button
           onClick={onClose}
           className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
@@ -33,4 +33,3 @@ export default function LevelUpToast({ level, onClose, duration = 5000 }) {
     </div>
   );
 }
-

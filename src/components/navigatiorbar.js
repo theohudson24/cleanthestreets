@@ -1,41 +1,32 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
 export default function NavigationBar() {
   const pathname = usePathname();
-  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Check for signed-in user in localStorage
-    const checkUser = () => {
-      if (typeof window !== 'undefined') {
-        const userData = localStorage.getItem('user');
-        if (userData) {
-          try {
-            setUser(JSON.parse(userData));
-          } catch (e) {
-            setUser(null);
-          }
-        } else {
+    const fetchSession = async () => {
+      try {
+        const response = await fetch('/api/auth/session', { cache: 'no-store' });
+        if (!response.ok) {
           setUser(null);
+          return;
         }
+
+        const data = await response.json();
+        setUser(data.user ?? null);
+      } catch (error) {
+        setUser(null);
       }
     };
 
-    // Check on mount
-    checkUser();
-
-    // Listen for storage changes (when user signs in/out in another tab)
-    if (typeof window !== 'undefined') {
-      window.addEventListener('storage', checkUser);
-      return () => window.removeEventListener('storage', checkUser);
-    }
-  }, [pathname]); // Re-check when pathname changes (e.g., after sign in)
+    fetchSession();
+  }, [pathname]);
 
   const isActive = (path) => pathname === path || pathname?.startsWith(path + '/');
 

@@ -15,7 +15,7 @@ export default function AboutPage() {
             system for everyone.
           </p>
           <p className="text-gray-700 leading-relaxed">
-            We're committed to making it easy for anyone to report issues and track their resolution, creating a 
+            We&apos;re committed to making it easy for anyone to report issues and track their resolution, creating a 
             transparent and collaborative approach to maintaining our public infrastructure.
           </p>
         </div>

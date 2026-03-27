@@ -9,7 +9,6 @@ export default function ImageUploader({
   maxSizeMB = 5 
 }) {
   const [previews, setPreviews] = useState(images);
-  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
 
@@ -102,4 +101,3 @@ export default function ImageUploader({
     </div>
   );
 }
-

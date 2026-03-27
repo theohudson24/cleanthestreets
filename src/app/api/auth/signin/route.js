@@ -1,40 +1,53 @@
 import prisma from "@/lib/prisma";
+import { createSession, setSessionCookie, toPublicUser } from "@/lib/auth";
+import {
+  applyRateLimit,
+  logSecurityEvent,
+  readValidatedJson,
+  requireCsrf,
+  toErrorResponse,
+} from "@/lib/security";
+import { signinSchema } from "@/lib/validation";
 import bcrypt from "bcryptjs";
+import { NextResponse } from "next/server";
 
-// Sign in route — now checks database for users and verifies password hashes
 export async function POST(request) {
   try {
-    const body = await request.json();
-    const { email, password } = body;
+    const csrfError = requireCsrf(request);
+    if (csrfError) {
+      return csrfError;
+    }
 
-    if (!email || !password) {
-      return Response.json(
-        { error: "Email and password are required" },
-        { status: 400 }
-      );
+    const { email, password } = await readValidatedJson(request, signinSchema);
+    const rateLimitResponse = applyRateLimit(request, {
+      bucket: "auth:signin",
+      identity: `${email}:${request.headers.get("x-forwarded-for") || "local"}`,
+      limit: 10,
+      windowMs: 10 * 60 * 1000,
+    });
+
+    if (rateLimitResponse) {
+      return rateLimitResponse;
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return Response.json(
-        { error: "Invalid email or password" },
-        { status: 401 }
-      );
+      logSecurityEvent("signin_failed", request, { email, reason: "user_not_found" });
+      return Response.json({ error: "Invalid email or password" }, { status: 401 });
     }
 
     const valid = bcrypt.compareSync(password, user.passwordHash);
     if (!valid) {
-      return Response.json(
-        { error: "Invalid email or password" },
-        { status: 401 }
-      );
+      logSecurityEvent("signin_failed", request, { email, reason: "bad_password" });
+      return Response.json({ error: "Invalid email or password" }, { status: 401 });
     }
 
-    // Omit passwordHash from returned user
-    const { passwordHash, ...safeUser } = user;
+    const { token, expiresAt } = await createSession(user.id);
+    const response = NextResponse.json({ user: toPublicUser(user) });
+    setSessionCookie(response, token, expiresAt);
 
-    return Response.json({ user: safeUser, token: `mock-token-${user.id}` });
+    return response;
   } catch (error) {
-    return Response.json({ error: "Sign in failed" }, { status: 500 });
+    return toErrorResponse(error, "Sign in failed");
   }
 }

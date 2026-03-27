@@ -28,16 +28,18 @@ npm install
 2. Set up Cloudinary (optional for MVP - image upload will work with configuration):
 
    - Create a free account at [Cloudinary](https://cloudinary.com)
-   - Go to Settings > Upload > Upload presets
-   - Create a new unsigned upload preset named `cleanthestreets`
    - Copy your Cloud Name from the dashboard
+   - Create an API key and secret in the Cloudinary console
+   - Optionally configure a folder for report uploads such as `cleanthestreets/reports`
 
 3. Create a `.env.local` file in the root directory and set local values (DO NOT commit `.env.local`):
 
 ```env
 DATABASE_URL="postgresql://postgres:password@localhost:5432/cleanthestreets_dev"
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="your-cloud-name"
-NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET="cleanthestreets"
+CLOUDINARY_API_KEY="your-cloudinary-api-key"
+CLOUDINARY_API_SECRET="your-cloudinary-api-secret"
+CLOUDINARY_UPLOAD_FOLDER="cleanthestreets/reports"
 ```
 
 4. Start the local Postgres database (Docker Compose):
@@ -92,6 +94,14 @@ If you are just restarting development and the schema has not changed, the short
 npm run db:up
 npm run dev
 ```
+
+To run the local backend smoke test against a running dev server:
+
+```bash
+npm run smoke:local
+```
+
+This verifies signup, session creation, CSRF enforcement, profile loading, request validation, report creation, ownership rules, leaderboard access, rate limiting, and signout.
 
 ## Viewing Database Data
 
@@ -174,6 +184,8 @@ The app includes API routes at `/api/reports`:
 ## Security & Secrets ⚠️
 
 - Keep any real credentials out of the repository. Create a local `.env.local` from `.env.example` and never commit it.
+- The backend now uses secure session cookies, CSRF tokens for mutating requests, request validation, rate limiting, and signed Cloudinary upload parameters.
+- Review [docs/security-operations.md](./docs/security-operations.md) for current controls, backup guidance, and secret-rotation expectations.
 - If you accidentally committed a `.env` file with secrets, remove it from the repository history or at minimum untrack it locally:
 
 ```bash

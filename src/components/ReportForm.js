@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { apiFetch } from '@/lib/client/csrf';
 import ImageUploader from './ImageUploader';
 import LoadingSpinner from './LoadingSpinner';
 
-// Dynamically import Map component
 const Map = dynamic(() => import('./Map'), {
   ssr: false,
 });
@@ -29,16 +29,15 @@ export default function ReportForm() {
   const [error, setError] = useState(null);
   const [uploadProgress, setUploadProgress] = useState({});
   const [showMap, setShowMap] = useState(false);
-  const [mapCenter, setMapCenter] = useState([40.7128, -74.0060]);
+  const [mapCenter, setMapCenter] = useState([40.7128, -74.006]);
+
   const centerOnCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setMapCenter([position.coords.latitude, position.coords.longitude]);
         },
-        () => {
-          // fall back silently
-        }
+        () => {}
       );
     }
   };
@@ -53,7 +52,6 @@ export default function ReportForm() {
     }
   };
 
-  // Get user's location
   const getLocation = () => {
     setLocationStatus('loading');
     if (navigator.geolocation) {
@@ -61,15 +59,15 @@ export default function ReportForm() {
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          setFormData({
-            ...formData,
+          setFormData((current) => ({
+            ...current,
             latitude: lat,
             longitude: lng,
-          });
+          }));
           setMapCenter([lat, lng]);
           setLocationStatus('success');
         },
-        (error) => {
+        () => {
           setLocationStatus('error');
           setError('Unable to retrieve your location. Please select on map.');
         }
@@ -80,57 +78,98 @@ export default function ReportForm() {
     }
   };
 
-  // Handle map click
-  const handleMapClick = (e) => {
-    const { lat, lng } = e.latlng;
-    setFormData({
-      ...formData,
+  const handleMapClick = (event) => {
+    const { lat, lng } = event.latlng;
+    setFormData((current) => ({
+      ...current,
       latitude: lat,
       longitude: lng,
-    });
+    }));
     setLocationStatus('success');
   };
 
-  // Upload images to Cloudinary
   const uploadImages = async (files) => {
-    const uploadPromises = files.map(async (file, index) => {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'cleanthestreets');
+    if (files.length === 0) return [];
 
-      setUploadProgress(prev => ({ ...prev, [index]: 0 }));
+    const signatureResponse = await apiFetch('/api/uploads/signature', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    });
 
-      try {
+    const signatureData = await signatureResponse.json();
+    if (!signatureResponse.ok) {
+      throw new Error(
+        signatureData.error || 'Image uploads are not configured for this environment.'
+      );
+    }
+
+    const {
+      cloudName,
+      apiKey,
+      timestamp,
+      signature,
+      folder,
+      allowedFormats,
+      maxFileBytes,
+      uploadTag,
+    } = signatureData;
+
+    return Promise.all(
+      files.map(async (file, index) => {
+        const extension = file.name.split('.').pop()?.toLowerCase() || '';
+        if (!allowedFormats.includes(extension)) {
+          throw new Error(`Image ${index + 1} must be a JPG, PNG, or WebP file`);
+        }
+
+        if (file.size > maxFileBytes) {
+          throw new Error(`Image ${index + 1} exceeds the 5MB upload limit`);
+        }
+
+        const payload = new FormData();
+        payload.append('file', file);
+        payload.append('api_key', apiKey);
+        payload.append('timestamp', String(timestamp));
+        payload.append('signature', signature);
+        payload.append('folder', folder);
+        payload.append('allowed_formats', allowedFormats.join(','));
+        payload.append('max_file_size', String(maxFileBytes));
+        payload.append('resource_type', 'image');
+        payload.append('tags', uploadTag);
+
+        setUploadProgress((current) => ({ ...current, [index]: 0 }));
+
         const response = await fetch(
-          `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'your-cloud-name'}/image/upload`,
+          `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
           {
             method: 'POST',
-            body: formData,
+            body: payload,
           }
         );
 
+        const data = await response.json();
         if (!response.ok) {
-          throw new Error(`Image ${index + 1} upload failed`);
+          setUploadProgress((current) => ({ ...current, [index]: -1 }));
+          throw new Error(data.error?.message || `Image ${index + 1} upload failed`);
         }
 
-        const data = await response.json();
-        setUploadProgress(prev => ({ ...prev, [index]: 100 }));
-        return data.secure_url;
-      } catch (error) {
-        setUploadProgress(prev => ({ ...prev, [index]: -1 }));
-        throw error;
-      }
-    });
-
-    return Promise.all(uploadPromises);
+        setUploadProgress((current) => ({ ...current, [index]: 100 }));
+        return {
+          url: data.secure_url,
+          publicId: data.public_id,
+          width: data.width,
+          height: data.height,
+          format: data.format,
+          bytes: data.bytes,
+        };
+      })
+    );
   };
 
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setError(null);
 
-    // Validation
     if (!formData.latitude || !formData.longitude) {
       setError('Please capture or select your location.');
       return;
@@ -144,39 +183,30 @@ export default function ReportForm() {
     setIsSubmitting(true);
 
     try {
-      let imageUrls = [];
-      if (imageFiles.length > 0) {
-        imageUrls = await uploadImages(imageFiles);
-      }
+      const images = imageFiles.length > 0 ? await uploadImages(imageFiles) : [];
 
-      const reportData = {
-        ...formData,
-        imageUrls: imageUrls.length > 0 ? imageUrls : null,
-        imageUrl: imageUrls[0] || null, // For backward compatibility
-        status: 'reported',
-        createdAt: new Date().toISOString(),
-      };
-
-      // Submit to backend API
-      const response = await fetch('/api/reports', {
+      const response = await apiFetch('/api/reports', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(reportData),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          images,
+        }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to submit report');
+      const result = await response.json();
+      if (response.status === 401) {
+        router.push('/signin?redirect=/report');
+        return;
       }
 
-      const result = await response.json();
-      
-      // Redirect to success page
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to submit report');
+      }
+
       router.push(`/report/success?id=${result.id}`);
-    } catch (err) {
-      setError(err.message || 'An error occurred while submitting your report.');
+    } catch (submitError) {
+      setError(submitError.message || 'An error occurred while submitting your report.');
     } finally {
       setIsSubmitting(false);
     }
@@ -190,28 +220,27 @@ export default function ReportForm() {
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Report an Issue</h1>
 
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Location Pick Section */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Location</h2>
-          
+
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               <button
                 type="button"
                 onClick={() => {
                   if (locationStatus === 'success') {
-                    setFormData({
-                      ...formData,
+                    setFormData((current) => ({
+                      ...current,
                       latitude: null,
                       longitude: null,
-                    });
+                    }));
                     setLocationStatus('pending');
                   } else {
                     getLocation();
                   }
                 }}
                 disabled={locationStatus === 'loading'}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 disabled:opacity-50"
               >
                 {locationStatus === 'loading' ? (
                   <span className="flex items-center">
@@ -224,13 +253,13 @@ export default function ReportForm() {
                   'Use My Location'
                 )}
               </button>
-              
+
               <button
                 type="button"
                 onClick={toggleMap}
                 className={`px-4 py-2 rounded-md shadow-sm font-semibold transition-colors ${
                   showMap
-                    ? 'bg-gradient-to-r from-red-600 to-rose-500 text-white shadow-[0_10px_25px_rgba(239,68,68,0.4)] hover:brightness-110'
+                    ? 'bg-gradient-to-r from-red-600 to-rose-500 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -258,9 +287,11 @@ export default function ReportForm() {
                 <input
                   type="text"
                   value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  onChange={(event) =>
+                    setFormData((current) => ({ ...current, address: event.target.value }))
+                  }
                   placeholder="Enter address..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                 />
               </div>
               <div className="grid grid-cols-2 gap-2">
@@ -291,10 +322,9 @@ export default function ReportForm() {
           </div>
         </div>
 
-        {/* Details Section */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Details</h2>
-          
+
           <div className="space-y-4">
             <div>
               <label htmlFor="issueType" className="block text-sm font-medium text-gray-700 mb-2">
@@ -303,8 +333,10 @@ export default function ReportForm() {
               <select
                 id="issueType"
                 value={formData.issueType}
-                onChange={(e) => setFormData({ ...formData, issueType: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                onChange={(event) =>
+                  setFormData((current) => ({ ...current, issueType: event.target.value }))
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                 required
               >
                 <option value="pothole">Pothole</option>
@@ -319,103 +351,76 @@ export default function ReportForm() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Severity (1-5) *
               </label>
-              <div className="flex items-center gap-3">
-                {[1, 2, 3, 4, 5].map((value) => {
-                  const isActive = formData.severity >= value;
-                  const colors = [
-                    'from-emerald-500 to-lime-400 border-emerald-200',
-                    'from-lime-500 to-amber-400 border-lime-200',
-                    'from-amber-500 to-orange-400 border-amber-200',
-                    'from-orange-500 to-red-400 border-orange-200',
-                    'from-red-500 to-rose-500 border-red-200',
-                  ];
-                  return (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, severity: value })}
-                      className={`h-10 w-10 rounded-lg border transition-all ${
-                        isActive
-                          ? `bg-gradient-to-br ${colors[value - 1]} shadow-lg shadow-black/30 text-white`
-                          : 'bg-gray-200/40 border-gray-400/20 text-gray-500'
-                      }`}
-                      aria-label={`Set severity ${value}`}
-                    >
-                      {value}
-                    </button>
-                  );
-                })}
-              </div>
+              <input
+                type="range"
+                min="1"
+                max="5"
+                value={formData.severity}
+                onChange={(event) =>
+                  setFormData((current) => ({
+                    ...current,
+                    severity: Number(event.target.value),
+                  }))
+                }
+                className="w-full"
+              />
+              <div className="text-sm text-gray-600 mt-1">Current severity: {formData.severity}</div>
             </div>
 
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-                Description * ({remainingChars} characters remaining)
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Description *
               </label>
               <textarea
-                id="description"
                 value={formData.description}
-                onChange={(e) => {
-                  if (e.target.value.length <= MAX_DESCRIPTION_LENGTH) {
-                    setFormData({ ...formData, description: e.target.value });
-                  }
-                }}
+                onChange={(event) =>
+                  setFormData((current) => ({
+                    ...current,
+                    description: event.target.value.slice(0, MAX_DESCRIPTION_LENGTH),
+                  }))
+                }
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                 placeholder="Describe the issue..."
-                required
               />
-              <p className="text-xs text-gray-500 mt-1">
-                {descriptionLength} / {MAX_DESCRIPTION_LENGTH} characters
-              </p>
+              <div className="text-xs text-gray-500 mt-1">{remainingChars} characters remaining</div>
             </div>
           </div>
         </div>
 
-        {/* Photos Section */}
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Photos (Optional)</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Photos</h2>
           <ImageUploader
-            images={imageFiles}
+            images={[]}
             onImagesChange={setImageFiles}
             maxImages={5}
             maxSizeMB={5}
           />
-        </div>
-
-        {/* Submit Section */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Summary</h2>
-          <div className="bg-gray-50 rounded-md p-4 mb-4">
-            <div className="space-y-2 text-sm">
-              <div><span className="font-semibold">Category:</span> {formData.issueType.replace('_', ' ')}</div>
-              <div><span className="font-semibold">Severity:</span> {formData.severity}/5</div>
-              <div><span className="font-semibold">Location:</span> {formData.latitude ? `${formData.latitude.toFixed(4)}, ${formData.longitude.toFixed(4)}` : 'Not set'}</div>
-              <div><span className="font-semibold">Photos:</span> {imageFiles.length}</div>
-            </div>
-          </div>
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-              {error}
+          {Object.keys(uploadProgress).length > 0 && (
+            <div className="mt-4 space-y-1 text-sm text-gray-600">
+              {Object.entries(uploadProgress).map(([index, progress]) => (
+                <div key={index}>
+                  Image {Number(index) + 1}:{' '}
+                  {progress === -1 ? 'failed' : `${progress}%`}
+                </div>
+              ))}
             </div>
           )}
-
-          <button
-            type="submit"
-            disabled={isSubmitting || !formData.latitude || !formData.longitude || !formData.description.trim()}
-            className="w-full px-4 py-3 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
-          >
-            {isSubmitting ? (
-              <span className="flex items-center justify-center">
-                <LoadingSpinner size="sm" className="mr-2" />
-                Submitting...
-              </span>
-            ) : (
-              'Submit Report'
-            )}
-          </button>
         </div>
+
+        {error && (
+          <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+            {error}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-60"
+        >
+          {isSubmitting ? 'Submitting...' : 'Submit Report'}
+        </button>
       </form>
     </div>
   );

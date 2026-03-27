@@ -1,28 +1,41 @@
 import prisma from "@/lib/prisma";
+import { createSession, setSessionCookie, toPublicUser } from "@/lib/auth";
+import {
+  applyRateLimit,
+  logSecurityEvent,
+  readValidatedJson,
+  requireCsrf,
+  toErrorResponse,
+} from "@/lib/security";
+import { signupSchema } from "@/lib/validation";
 import bcrypt from "bcryptjs";
+import { NextResponse } from "next/server";
 
-// Sign up route — creates a new user in the database with a hashed password
 export async function POST(request) {
   try {
-    const body = await request.json();
-    const { email, password, displayName } = body;
-
-    if (!email || !password || !displayName) {
-      return Response.json(
-        { error: "Email, password, and display name are required" },
-        { status: 400 }
-      );
+    const csrfError = requireCsrf(request);
+    if (csrfError) {
+      return csrfError;
     }
 
-    if (password.length < 8) {
-      return Response.json(
-        { error: "Password must be at least 8 characters" },
-        { status: 400 }
-      );
+    const { email, password, displayName } = await readValidatedJson(
+      request,
+      signupSchema
+    );
+    const rateLimitResponse = applyRateLimit(request, {
+      bucket: "auth:signup",
+      identity: `${email}:${request.headers.get("x-forwarded-for") || "local"}`,
+      limit: 5,
+      windowMs: 10 * 60 * 1000,
+    });
+
+    if (rateLimitResponse) {
+      return rateLimitResponse;
     }
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
+      logSecurityEvent("signup_duplicate_email", request, { email });
       return Response.json({ error: "Email already in use" }, { status: 409 });
     }
 
@@ -32,13 +45,15 @@ export async function POST(request) {
       data: { email, passwordHash, displayName },
     });
 
-    const { passwordHash: _ph, ...safeUser } = user;
-
-    return Response.json(
-      { user: safeUser, token: `mock-token-${user.id}` },
+    const { token, expiresAt } = await createSession(user.id);
+    const response = NextResponse.json(
+      { user: toPublicUser(user) },
       { status: 201 }
     );
+    setSessionCookie(response, token, expiresAt);
+
+    return response;
   } catch (error) {
-    return Response.json({ error: "Sign up failed" }, { status: 500 });
+    return toErrorResponse(error, "Sign up failed");
   }
 }

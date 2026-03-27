@@ -1,62 +1,60 @@
-// API route for leaderboard
-// In a real application, this would aggregate data from the database
+import prisma from "@/lib/prisma";
+import { parseValidatedSearchParams, toErrorResponse } from "@/lib/security";
+import { leaderboardQuerySchema } from "@/lib/validation";
 
 export async function GET(request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const period = searchParams.get('period') || 'all';
-    
-    // In a real app, this would:
-    // 1. Query database for users with reports
-    // 2. Group by userId
-    // 3. Count reports per user
-    // 4. Filter by time period if needed
-    // 5. Sort by count descending
-    // 6. Limit to top N
-    
-    // For MVP, return mock data
-    // Include test accounts for testing
-    const leaderboard = [
-      {
-        userId: 'admin-1',
-        displayName: 'Admin User',
-        totalReports: 25,
-        city: 'New York',
-        avatar: null,
+    const { period, limit } = parseValidatedSearchParams(
+      request,
+      leaderboardQuerySchema
+    );
+    const where = { userId: { not: null } };
+
+    if (period === "week") {
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      where.createdAt = { gte: oneWeekAgo };
+    }
+
+    const grouped = await prisma.report.groupBy({
+      by: ["userId"],
+      where,
+      _count: { _all: true },
+      orderBy: {
+        _count: {
+          userId: "desc",
+        },
       },
-      {
-        userId: 'user-1',
-        displayName: 'Test User',
-        totalReports: 18,
-        city: 'Los Angeles',
-        avatar: null,
+      take: limit,
+    });
+
+    const userIds = grouped.map((entry) => entry.userId).filter(Boolean);
+    const users = await prisma.user.findMany({
+      where: { id: { in: userIds } },
+      select: {
+        id: true,
+        displayName: true,
+        avatarUrl: true,
+        location: true,
       },
-      {
-        userId: '1',
-        displayName: 'John Doe',
-        totalReports: 15,
-        city: 'New York',
-        avatar: null,
-      },
-      {
-        userId: '2',
-        displayName: 'Jane Smith',
-        totalReports: 12,
-        city: 'Los Angeles',
-        avatar: null,
-      },
-      {
-        userId: '3',
-        displayName: 'Bob Johnson',
-        totalReports: 8,
-        city: 'Chicago',
-        avatar: null,
-      },
-    ];
-    
+    });
+
+    const userMap = new Map(users.map((user) => [user.id, user]));
+    const leaderboard = grouped.map((entry, index) => {
+      const user = userMap.get(entry.userId);
+
+      return {
+        userId: entry.userId,
+        rank: index + 1,
+        displayName: user?.displayName ?? "User",
+        totalReports: entry._count._all,
+        avatar: user?.avatarUrl ?? null,
+        location: user?.location ?? null,
+      };
+    });
+
     return Response.json(leaderboard);
   } catch (error) {
-    return Response.json({ error: 'Failed to fetch leaderboard' }, { status: 500 });
+    return toErrorResponse(error, "Failed to fetch leaderboard");
   }
 }
-

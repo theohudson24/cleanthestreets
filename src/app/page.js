@@ -19,7 +19,8 @@ export default function Home() {
     try {
       const response = await fetch('/api/reports');
       if (response.ok) {
-        const reports = await response.json();
+        const data = await response.json();
+        const reports = data.items ?? [];
         const total = reports.length;
         const fixed = reports.filter((r) => r.status === 'fixed').length;
         const recent = reports.filter((r) => {

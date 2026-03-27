@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { apiFetch } from '@/lib/client/csrf';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function SignUpPage() {
@@ -34,7 +35,7 @@ export default function SignUpPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/signup', {
+      const response = await apiFetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -49,8 +50,8 @@ export default function SignUpPage() {
         throw new Error(errorData.error || 'Sign up failed');
       }
 
-      // Redirect to sign in
-      router.push('/signin');
+      router.refresh();
+      router.push('/profile');
     } catch (err) {
       setError(err.message || 'An error occurred during sign up.');
     } finally {

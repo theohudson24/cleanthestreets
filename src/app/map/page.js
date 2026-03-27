@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import FilterChips from '@/components/FilterChips';
@@ -21,7 +21,7 @@ const Map = dynamic(() => import('@/components/Map'), {
   ),
 });
 
-export default function MapPage() {
+function MapPageContent() {
   const searchParams = useSearchParams();
   const [reports, setReports] = useState([]);
   const [filteredReports, setFilteredReports] = useState([]);
@@ -68,7 +68,7 @@ export default function MapPage() {
         throw new Error('Failed to fetch reports');
       }
       const data = await response.json();
-      setReports(data);
+      setReports(data.items ?? []);
       setError(null);
     } catch (err) {
       setError(err.message);
@@ -306,5 +306,19 @@ export default function MapPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function MapPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-slate-950">
+          <LoadingSpinner size="lg" />
+        </div>
+      }
+    >
+      <MapPageContent />
+    </Suspense>
   );
 }

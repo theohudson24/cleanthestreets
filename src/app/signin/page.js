@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { apiFetch } from '@/lib/client/csrf';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
-export default function SignInPage() {
+function SignInPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -18,8 +19,7 @@ export default function SignInPage() {
     setLoading(true);
 
     try {
-      // In a real app, this would authenticate with your backend
-      const response = await fetch('/api/auth/signin', {
+      const response = await apiFetch('/api/auth/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -30,16 +30,8 @@ export default function SignInPage() {
         throw new Error(errorData.error || 'Sign in failed');
       }
 
-      const data = await response.json();
-      
-      // Store user data in localStorage for MVP (in production, use secure session)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('token', data.token);
-      }
-      
-      // Redirect to previous page or default to profile
       const redirectTo = searchParams?.get('redirect') || '/profile';
+      router.refresh();
       router.push(redirectTo);
     } catch (err) {
       setError(err.message || 'An error occurred during sign in.');
@@ -119,7 +111,7 @@ export default function SignInPage() {
 
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/signup" className="text-blue-600 hover:text-blue-800">
               Sign up
             </Link>
@@ -127,5 +119,19 @@ export default function SignInPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-slate-950">
+          <LoadingSpinner size="lg" />
+        </div>
+      }
+    >
+      <SignInPageContent />
+    </Suspense>
   );
 }

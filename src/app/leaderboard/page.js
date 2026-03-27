@@ -3,37 +3,42 @@
 import { useEffect, useState } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import EmptyState from '@/components/EmptyState';
-import { getMockLeaderboard } from '@/data/mockUserData';
 
 export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [timeFilter, setTimeFilter] = useState('all'); // 'all' or 'week'
+  const [timeFilter, setTimeFilter] = useState('all');
   const [currentUserId, setCurrentUserId] = useState(null);
 
   useEffect(() => {
-    // Get current user ID
-    if (typeof window !== 'undefined') {
-      const userData = localStorage.getItem('user');
-      if (userData) {
-        try {
-          const user = JSON.parse(userData);
-          setCurrentUserId(user.id);
-        } catch (e) {
-          // Ignore
-        }
-      }
-    }
     fetchLeaderboard();
   }, [timeFilter]);
 
   const fetchLeaderboard = async () => {
     try {
-      // For MVP, use mock data
-      const data = getMockLeaderboard(timeFilter);
+      setLoading(true);
+
+      const [sessionResponse, leaderboardResponse] = await Promise.all([
+        fetch('/api/auth/session', { cache: 'no-store' }),
+        fetch(`/api/leaderboard?period=${timeFilter}`, { cache: 'no-store' }),
+      ]);
+
+      if (sessionResponse.ok) {
+        const sessionData = await sessionResponse.json();
+        setCurrentUserId(sessionData.user?.id ?? null);
+      } else {
+        setCurrentUserId(null);
+      }
+
+      if (!leaderboardResponse.ok) {
+        throw new Error('Failed to fetch leaderboard');
+      }
+
+      const data = await leaderboardResponse.json();
       setLeaderboard(data);
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
+      setLeaderboard([]);
     } finally {
       setLoading(false);
     }
@@ -52,7 +57,6 @@ export default function LeaderboardPage() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Leaderboard</h1>
 
-        {/* Time Filter Tabs */}
         <div className="bg-white rounded-lg shadow-md p-4 mb-6">
           <div className="flex gap-2">
             <button
@@ -78,11 +82,10 @@ export default function LeaderboardPage() {
           </div>
         </div>
 
-        {/* Leaderboard Table */}
         {leaderboard.length === 0 ? (
           <EmptyState
-            title="Leaderboard Coming Soon"
-            description="The leaderboard will update as reports come in. Be the first to contribute!"
+            title="No Leaderboard Data Yet"
+            description="The leaderboard will update once signed-in users submit reports."
             actionLabel="Report an Issue"
             actionHref="/report"
           />
@@ -117,6 +120,7 @@ export default function LeaderboardPage() {
                     : isCurrentUser
                       ? 'bg-blue-900/40 border border-blue-400/30'
                       : 'bg-transparent';
+
                   return (
                     <tr
                       key={user.userId}
@@ -145,9 +149,9 @@ export default function LeaderboardPage() {
                             <span className="text-sm font-medium text-gray-900">
                               {user.displayName || `User ${user.userId}`}
                             </span>
-                            {isCurrentUser && user.currentLevel && (
-                              <div className="text-xs text-blue-300 font-semibold mt-1">
-                                Level {user.currentLevel}
+                            {user.location && (
+                              <div className="text-xs text-gray-500 mt-1">
+                                {user.location}
                               </div>
                             )}
                           </div>

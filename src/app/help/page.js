@@ -49,7 +49,7 @@ export default function HelpPage() {
                 Can I report the same issue multiple times?
               </h3>
               <p className="text-gray-700">
-                Yes, if an issue hasn't been fixed, you can report it again. However, we recommend waiting a reasonable amount of time before reporting the same issue.
+                Yes, if an issue hasn&apos;t been fixed, you can report it again. However, we recommend waiting a reasonable amount of time before reporting the same issue.
               </p>
             </div>
 
@@ -58,7 +58,7 @@ export default function HelpPage() {
                 How do I update my report?
               </h3>
               <p className="text-gray-700">
-                Currently, you can view your reports on the "My Reports" page. Status updates are handled by our team as issues are addressed.
+                Currently, you can view your reports on the &quot;My Reports&quot; page. Status updates are handled by our team as issues are addressed.
               </p>
             </div>
 

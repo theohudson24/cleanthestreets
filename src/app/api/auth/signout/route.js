@@ -1,16 +1,24 @@
-// API route for sign out
-// In a real application, this would invalidate the session/token
+import { clearSessionCookie, invalidateSession } from "@/lib/auth";
+import { NextResponse } from "next/server";
+import { requireCsrf, toErrorResponse } from "@/lib/security";
 
-export async function POST() {
+export async function POST(request) {
   try {
-    // In a real app, this would:
-    // 1. Invalidate the session/token on the server
-    // 2. Clear any server-side session data
-    
-    // For MVP, client-side handles clearing localStorage
-    return Response.json({ success: true, message: 'Signed out successfully' });
+    const csrfError = requireCsrf(request);
+    if (csrfError) {
+      return csrfError;
+    }
+
+    await invalidateSession(request);
+
+    const response = NextResponse.json({
+      success: true,
+      message: "Signed out successfully",
+    });
+    clearSessionCookie(response);
+
+    return response;
   } catch (error) {
-    return Response.json({ error: 'Sign out failed' }, { status: 500 });
+    return toErrorResponse(error, "Sign out failed");
   }
 }
-
