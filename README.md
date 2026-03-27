@@ -32,11 +32,12 @@ npm install
    - Create a new unsigned upload preset named `cleanthestreets`
    - Copy your Cloud Name from the dashboard
 
-3. Create a `.env.local` file in the root directory by copying `.env.example` and filling in local values (DO NOT commit `.env.local`):
+3. Create a `.env.local` file in the root directory and set local values (DO NOT commit `.env.local`):
 
-```bash
-cp .env.example .env.local
-# then edit .env.local to set values such as DATABASE_URL
+```env
+DATABASE_URL="postgresql://postgres:password@localhost:5432/cleanthestreets_dev"
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="your-cloud-name"
+NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET="cleanthestreets"
 ```
 
 4. Start the local Postgres database (Docker Compose):
@@ -49,10 +50,10 @@ npm run db:up
 
 ```bash
 npm run db:test       # checks the DATABASE_URL can connect
-npx prisma generate
-npx prisma migrate dev --name init
+npm run prisma:migrate
+npm run prisma:generate
 npm run prisma:seed   # optional: seed sample data
-npx prisma studio     # inspect data in a GUI
+npm run prisma:studio # inspect data in a GUI
 ```
 
 6. Run the development server:
@@ -62,6 +63,60 @@ npm run dev
 ```
 
 7. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Local Startup
+
+For normal local development, start the app in this order:
+
+```bash
+npm run db:up
+npm run db:test
+npm run prisma:migrate
+npm run prisma:generate
+npm run prisma:seed
+npm run dev
+```
+
+Notes:
+
+- `npm run db:up` starts the Postgres Docker container.
+- `npm run db:test` verifies Postgres is reachable using `DATABASE_URL`.
+- `npm run prisma:migrate` applies schema changes to the local database.
+- `npm run prisma:generate` rebuilds the Prisma client your app imports.
+- `npm run prisma:seed` inserts local test users and sample records.
+- `npm run dev` starts the Next.js app at `http://localhost:3000`.
+
+If you are just restarting development and the schema has not changed, the shorter flow is usually enough:
+
+```bash
+npm run db:up
+npm run dev
+```
+
+## Viewing Database Data
+
+The easiest way to inspect the database is Prisma Studio:
+
+```bash
+npm run prisma:studio
+```
+
+That opens a browser UI where you can view and edit `User`, `Report`, and `ReportImage` records.
+
+If you want direct SQL access through Docker:
+
+```bash
+docker compose exec db psql -U postgres -d cleanthestreets_dev
+```
+
+Useful `psql` commands:
+
+```sql
+\dt
+SELECT * FROM "User";
+SELECT * FROM "Report";
+SELECT * FROM "ReportImage";
+```
 
 ## Project Structure
 

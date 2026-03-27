@@ -16,6 +16,10 @@ if (fs.existsSync(envLocalPath)) {
 
 const { Client } = require("pg");
 
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 (async function () {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
@@ -42,18 +46,32 @@ const { Client } = require("pg");
     `Attempting to connect as user '${dbUser}' to ${dbHost}:${dbPort}`
   );
 
-  const client = new Client({ connectionString: databaseUrl });
-  try {
-    await client.connect();
-    const res = await client.query("SELECT 1 as ok, version() as version");
-    console.log("✅ Connected to Postgres", res.rows[0]);
-    await client.end();
-    process.exit(0);
-  } catch (err) {
-    console.error("❌ Failed to connect to Postgres:", err.message);
-    console.error(
-      "Hints: - Check your DATABASE_URL in .env.local; - Ensure the Docker Postgres container is running (docker compose ps); - Check Postgres logs ('docker compose logs -f db') for authentication errors."
-    );
-    process.exit(2);
+  const maxAttempts = 10;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const client = new Client({ connectionString: databaseUrl });
+
+    try {
+      await client.connect();
+      const res = await client.query("SELECT 1 as ok, version() as version");
+      console.log("✅ Connected to Postgres", res.rows[0]);
+      await client.end();
+      process.exit(0);
+    } catch (err) {
+      await client.end().catch(() => {});
+
+      if (attempt === maxAttempts) {
+        console.error("❌ Failed to connect to Postgres:", err.message);
+        console.error(
+          "Hints: - Check your DATABASE_URL in .env.local; - Ensure the Docker Postgres container is running (docker compose ps); - Check Postgres logs ('docker compose logs -f db') for authentication errors."
+        );
+        process.exit(2);
+      }
+
+      console.log(
+        `Database not ready yet (${attempt}/${maxAttempts}): ${err.message}`
+      );
+      await wait(2000);
+    }
   }
 })();
