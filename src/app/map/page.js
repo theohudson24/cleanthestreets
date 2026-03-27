@@ -148,16 +148,8 @@ function MapPageContent() {
 
           {/* Filters */}
           <div className="rounded-2xl border border-white/10 bg-slate-900/75 shadow-[0_18px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl">
-            <div className="flex items-center justify-between px-4 pt-4">
+            <div className="px-4 pt-4">
               <p className="text-[13px] font-semibold text-slate-50">Filter reports</p>
-              {hasActiveFilters && (
-                <button
-                  onClick={clearFilters}
-                  className="text-[11px] font-semibold text-indigo-200 hover:text-white"
-                >
-                  Reset
-                </button>
-              )}
             </div>
             <div className="px-4 pb-4 space-y-4">
               <div>
@@ -190,6 +182,16 @@ function MapPageContent() {
                   variant="linear"
                 />
               </div>
+              {hasActiveFilters && (
+                <div className="pt-1">
+                  <button
+                    onClick={clearFilters}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-indigo-200 transition hover:border-indigo-300/50 hover:text-white"
+                  >
+                    Clear filters
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -236,9 +238,6 @@ function MapPageContent() {
           <EmptyState
             title="No results found"
             description="Try adjusting your filters to see more reports."
-            actionLabel="Clear Filters"
-            actionHref="#"
-            icon={<button onClick={clearFilters} className="text-indigo-300 hover:text-white">Clear Filters</button>}
           />
         </div>
       )}

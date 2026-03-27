@@ -164,9 +164,6 @@ export default function Home() {
             </div>
 
             <div className="relative mt-4">
-              {/* connector line (desktop) */}
-              <div className="hidden sm:block absolute left-[12%] right-[12%] top-6 h-px bg-gradient-to-r from-white/10 via-white/20 to-white/10" />
-
               <div className="grid gap-8 sm:grid-cols-3">
                 {/* Step 1 */}
                 <div className="relative flex flex-col gap-2">

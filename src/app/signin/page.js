@@ -49,15 +49,6 @@ function SignInPageContent() {
           Sign in to save your reports and track their status updates.
         </p>
 
-        {/* Test Account Info */}
-        <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
-          <p className="text-sm font-semibold text-blue-900 mb-2">Test Accounts (for testing):</p>
-          <div className="text-xs text-blue-800 space-y-1">
-            <p><strong>Admin:</strong> admin@test.com / admin12345</p>
-            <p><strong>User:</strong> test@test.com / test12345</p>
-          </div>
-        </div>
-
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
