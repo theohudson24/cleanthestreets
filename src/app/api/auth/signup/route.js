@@ -11,6 +11,8 @@ import { signupSchema } from "@/lib/validation";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 
+const PASSWORD_HASH_ROUNDS = 12;
+
 export async function POST(request) {
   try {
     const csrfError = requireCsrf(request);
@@ -39,7 +41,7 @@ export async function POST(request) {
       return Response.json({ error: "Email already in use" }, { status: 409 });
     }
 
-    const passwordHash = bcrypt.hashSync(password, 10);
+    const passwordHash = await bcrypt.hash(password, PASSWORD_HASH_ROUNDS);
 
     const user = await prisma.user.create({
       data: { email, passwordHash, displayName },

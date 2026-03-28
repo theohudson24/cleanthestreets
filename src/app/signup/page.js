@@ -6,6 +6,35 @@ import Link from 'next/link';
 import { apiFetch } from '@/lib/client/csrf';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
+const PASSWORD_REQUIREMENTS = [
+  {
+    label: 'Must be at least 8 characters',
+    test: (value) => value.length >= 8,
+  },
+  {
+    label: 'Must have an uppercase letter',
+    test: (value) => /[A-Z]/.test(value),
+  },
+  {
+    label: 'Must have a lowercase letter',
+    test: (value) => /[a-z]/.test(value),
+  },
+  {
+    label: 'Must have a number',
+    test: (value) => /\d/.test(value),
+  },
+  {
+    label: 'Must have a special character',
+    test: (value) => /[^A-Za-z0-9]/.test(value),
+  },
+];
+
+const PASSWORD_ERROR_MESSAGE =
+  'Password must be at least 8 characters long and include an uppercase letter, lowercase letter, number, and special character.';
+
+const passwordMeetsRequirements = (value) =>
+  PASSWORD_REQUIREMENTS.every((requirement) => requirement.test(value));
+
 export default function SignUpPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -16,6 +45,10 @@ export default function SignUpPage() {
   });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const passwordChecks = PASSWORD_REQUIREMENTS.map((requirement) => ({
+    label: requirement.label,
+    met: requirement.test(formData.password),
+  }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,8 +60,8 @@ export default function SignUpPage() {
       return;
     }
 
-    if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters long');
+    if (!passwordMeetsRequirements(formData.password)) {
+      setError(PASSWORD_ERROR_MESSAGE);
       return;
     }
 
@@ -114,9 +147,24 @@ export default function SignUpPage() {
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required
               minLength={8}
+              autoComplete="new-password"
+              title={PASSWORD_ERROR_MESSAGE}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
-            <p className="text-xs text-gray-500 mt-1">Must be at least 8 characters</p>
+            <div className="mt-2 space-y-0.5">
+              {passwordChecks.map((requirement) => (
+                <p
+                  key={requirement.label}
+                  className={`text-xs font-medium transition ${
+                    requirement.met
+                      ? 'text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.35)]'
+                      : 'text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.3)]'
+                  }`}
+                >
+                  {requirement.label}
+                </p>
+              ))}
+            </div>
           </div>
 
           <div>
@@ -129,6 +177,7 @@ export default function SignUpPage() {
               value={formData.confirmPassword}
               onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
               required
+              autoComplete="new-password"
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>

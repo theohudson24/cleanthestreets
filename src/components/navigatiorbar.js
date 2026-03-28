@@ -50,9 +50,16 @@ export default function NavigationBar() {
           <div className="flex items-center gap-3">
             <Link
               href="/"
-              className="text-lg sm:text-xl font-semibold text-white tracking-tight"
+              className="group inline-flex items-center rounded-xl px-2 py-1.5 text-white transition hover:bg-white/[0.04]"
             >
-              CleanTheStreets
+              <span className="flex flex-col leading-none">
+                <span className="bg-gradient-to-r from-slate-100 via-blue-100 to-cyan-300 bg-clip-text text-lg font-semibold tracking-tight text-transparent sm:text-xl">
+                  CleanTheStreets
+                </span>
+                <span className="mt-1 pl-[1px] text-[0.5rem] font-semibold uppercase tracking-[0.22em] text-slate-500 sm:text-[0.55rem]">
+                  Report. Repair. Improve.
+                </span>
+              </span>
             </Link>
           </div>
           
@@ -70,7 +77,7 @@ export default function NavigationBar() {
               >
                 {link.label}
                 {!isActive(link.href) && (
-                  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-500/0 via-blue-500/0 to-cyan-400/0 opacity-0 blur-md transition hover:opacity-50" />
+                  <span className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-r from-indigo-500/0 via-blue-500/0 to-cyan-400/0 opacity-0 blur-md transition hover:opacity-50" />
                 )}
               </Link>
             ))}

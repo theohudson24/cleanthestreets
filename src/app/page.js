@@ -114,7 +114,7 @@ export default function Home() {
                   <h2 className="text-sm font-semibold text-slate-50">This week at a glance</h2>
                   <p className="text-xs text-slate-400">Live stats from community reports.</p>
                 </div>
-                <span className="rounded-full bg-white/5 px-3 py-1 text-[11px] font-semibold text-slate-100 border border-white/10">
+                <span className="rounded-full border border-red-300/40 bg-red-500/20 px-3 py-1 text-[11px] font-semibold text-white shadow-[0_0_0_1px_rgba(252,165,165,0.12),0_0_32px_rgba(239,68,68,0.28)] animate-[pulse_2.8s_ease-in-out_infinite]">
                   Updated in real time
                 </span>
               </div>
@@ -133,7 +133,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-                  <div className="text-[11px] font-semibold text-slate-300 mb-2">New (last 7 days)</div>
+                  <div className="text-[11px] font-semibold text-slate-300 mb-2">Last 7 days</div>
                   <div className="text-2xl font-semibold text-amber-300 leading-tight">
                     {loading ? <LoadingSpinner size="sm" className="mx-auto" /> : stats.recent ?? '—'}
                   </div>

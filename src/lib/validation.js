@@ -10,6 +10,23 @@ export const ISSUE_TYPES = [
 
 export const REPORT_STATUSES = ["reported", "in_progress", "fixed"];
 
+const passwordSchema = z
+  .string()
+  .min(8, "Password must be at least 8 characters long.")
+  .max(128, "Password must be 128 characters or fewer.")
+  .refine((value) => /[A-Z]/.test(value), {
+    message: "Password must include at least one uppercase letter.",
+  })
+  .refine((value) => /[a-z]/.test(value), {
+    message: "Password must include at least one lowercase letter.",
+  })
+  .refine((value) => /\d/.test(value), {
+    message: "Password must include at least one number.",
+  })
+  .refine((value) => /[^A-Za-z0-9]/.test(value), {
+    message: "Password must include at least one special character.",
+  });
+
 const trimmedOptionalString = (maxLength) =>
   z
     .string()
@@ -38,7 +55,7 @@ export const signinSchema = z
 export const signupSchema = z
   .object({
     email: z.string().trim().email().max(254).transform((value) => value.toLowerCase()),
-    password: z.string().min(8).max(128),
+    password: passwordSchema,
     displayName: z.string().trim().min(2).max(60),
   })
   .strict();
