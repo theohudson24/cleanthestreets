@@ -14,7 +14,7 @@ const Map = dynamic(() => import('@/components/Map'), {
   loading: () => (
     <div className="w-full h-screen flex items-center justify-center">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700 mx-auto mb-4"></div>
         <p className="text-gray-600">Loading map...</p>
       </div>
     </div>
@@ -112,18 +112,18 @@ function MapPageContent() {
   const hasActiveFilters = categoryFilter.length > 0 || statusFilter.length > 0;
 
   return (
-    <div className="relative h-screen bg-slate-950">
+    <div className="relative h-screen bg-white">
       {/* Map Controls */}
       <div className="absolute top-4 right-4 z-[1000] pointer-events-none">
         <div className="pointer-events-auto space-y-3 w-[min(440px,calc(100vw-2rem))] sm:w-[min(480px,calc(100vw-3rem))]">
           {/* Search */}
-          <div className="rounded-2xl border border-white/10 bg-slate-900/80 shadow-[0_20px_60px_rgba(0,0,0,0.55)] backdrop-blur-xl">
+          <div className="rounded-2xl border border-green-100 bg-white shadow-sm">
             <div className="flex items-center justify-between px-4 py-3">
               <div>
-                <p className="text-[13px] font-semibold text-slate-50">Find a location</p>
-                <p className="text-xs text-slate-400">Search or pan the map to explore.</p>
+                <p className="text-[13px] font-semibold text-gray-900">Find a location</p>
+                <p className="text-xs text-gray-500">Search or pan the map to explore.</p>
               </div>
-              <span className="rounded-full bg-white/5 px-3 py-1 text-[11px] font-medium text-slate-200 border border-white/10">
+              <span className="rounded-full bg-green-50 px-3 py-1 text-[11px] font-medium text-green-700 border border-green-100">
                 Live
               </span>
             </div>
@@ -134,11 +134,11 @@ function MapPageContent() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search address or place…"
-                  className="flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-400/60 focus:border-indigo-200"
+                  className="flex-1 rounded-xl border border-green-100 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-green-500"
                 />
                 <button
                   type="submit"
-                  className="rounded-xl bg-gradient-to-r from-indigo-500 to-blue-500 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-indigo-500/25 hover:brightness-105"
+                  className="rounded-xl bg-green-700 px-4 py-2 text-xs font-semibold text-white hover:bg-green-800"
                 >
                   Search
                 </button>
@@ -147,13 +147,13 @@ function MapPageContent() {
           </div>
 
           {/* Filters */}
-          <div className="rounded-2xl border border-white/10 bg-slate-900/75 shadow-[0_18px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+          <div className="rounded-2xl border border-green-100 bg-white shadow-sm">
             <div className="px-4 pt-4">
-              <p className="text-[13px] font-semibold text-slate-50">Filter reports</p>
+              <p className="text-[13px] font-semibold text-gray-900">Filter reports</p>
             </div>
             <div className="px-4 pb-4 space-y-4">
               <div>
-                <div className="text-[11px] uppercase tracking-wide text-slate-400 mb-2">Category</div>
+                <div className="text-[11px] uppercase tracking-wide text-gray-500 mb-2">Category</div>
                 <FilterChips
                   filters={categoryFilter}
                   onFilterChange={(value) => {
@@ -168,7 +168,7 @@ function MapPageContent() {
                 />
               </div>
               <div>
-                <div className="text-[11px] uppercase tracking-wide text-slate-400 mb-2">Status</div>
+                <div className="text-[11px] uppercase tracking-wide text-gray-500 mb-2">Status</div>
                 <FilterChips
                   filters={statusFilter}
                   onFilterChange={(value) => {
@@ -186,7 +186,7 @@ function MapPageContent() {
                 <div className="pt-1">
                   <button
                     onClick={clearFilters}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-indigo-200 transition hover:border-indigo-300/50 hover:text-white"
+                    className="w-full rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-100"
                   >
                     Clear filters
                   </button>
@@ -196,20 +196,20 @@ function MapPageContent() {
           </div>
 
           {/* Legend */}
-          <div className="rounded-xl border border-white/10 bg-slate-900/70 shadow-lg shadow-black/50 backdrop-blur-xl px-4 py-3 text-slate-100">
-            <h3 className="text-xs font-semibold mb-2 text-slate-200">Status legend</h3>
+          <div className="rounded-xl border border-green-100 bg-white shadow-sm px-4 py-3 text-gray-900">
+            <h3 className="text-xs font-semibold mb-2 text-gray-700">Status legend</h3>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-blue-400" />
-                <span className="text-xs text-slate-300">Reported</span>
+                <div className="w-4 h-4 rounded-full bg-green-500" />
+                <span className="text-xs text-gray-600">Reported</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full bg-amber-400" />
-                <span className="text-xs text-slate-300">In Progress</span>
+                <span className="text-xs text-gray-600">In Progress</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full bg-emerald-400" />
-                <span className="text-xs text-slate-300">Fixed</span>
+                <span className="text-xs text-gray-600">Fixed</span>
               </div>
             </div>
           </div>
@@ -296,7 +296,7 @@ function MapPageContent() {
             <div className="mt-6">
               <a
                 href={`/issue/${selectedIssue.id}`}
-                className="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                className="block w-full text-center px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-800"
               >
                 View Full Details
               </a>
@@ -312,7 +312,7 @@ export default function MapPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-slate-950">
+        <div className="min-h-screen flex items-center justify-center bg-white">
           <LoadingSpinner size="lg" />
         </div>
       }

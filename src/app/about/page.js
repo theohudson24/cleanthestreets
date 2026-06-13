@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900 text-slate-100">
+    <div className="min-h-screen bg-white text-gray-900">
       <div className="max-w-4xl mx-auto px-4 py-16">
         <h1 className="text-4xl font-bold text-gray-900 mb-8">About CleanTheStreets</h1>
 
@@ -57,7 +57,7 @@ export default function AboutPage() {
           </p>
           <p className="text-gray-700">
             Map data provided by{' '}
-            <a href="https://www.openstreetmap.org" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline">
+            <a href="https://www.openstreetmap.org" target="_blank" rel="noopener noreferrer" className="text-green-700 hover:text-green-900 underline">
               OpenStreetMap
             </a>
             .

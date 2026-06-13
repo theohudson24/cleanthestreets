@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import {
   clearCsrfCookie,
   setCsrfCookie,
+  shouldUseSecureCookies,
   unauthorizedError,
 } from "@/lib/security";
 
@@ -105,7 +106,7 @@ export function setSessionCookie(response, token, expiresAt) {
   response.cookies.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookies(),
     expires: expiresAt,
     path: "/",
     priority: "high",
@@ -118,7 +119,7 @@ export function clearSessionCookie(response) {
   response.cookies.set(SESSION_COOKIE_NAME, "", {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookies(),
     expires: new Date(0),
     path: "/",
     priority: "high",

@@ -135,7 +135,7 @@ export default function ProfilePage() {
     : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900 text-slate-100">
+    <div className="min-h-screen bg-white text-gray-900">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex items-start gap-6">
@@ -168,7 +168,7 @@ export default function ProfilePage() {
                     setFormSuccess(null);
                     setIsEditing(!isEditing);
                   }}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium self-start md:self-auto"
+                  className="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-800 transition-colors text-sm font-medium self-start md:self-auto"
                 >
                   {isEditing ? 'Cancel' : 'Edit Profile'}
                 </button>
@@ -201,7 +201,7 @@ export default function ProfilePage() {
                           displayName: event.target.value,
                         }))
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
                     />
                   </div>
                   <div>
@@ -217,7 +217,7 @@ export default function ProfilePage() {
                         }))
                       }
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
                       placeholder="Tell us about yourself..."
                     />
                   </div>
@@ -234,7 +234,7 @@ export default function ProfilePage() {
                           location: event.target.value,
                         }))
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
                       placeholder="City, State"
                     />
                   </div>
@@ -251,7 +251,7 @@ export default function ProfilePage() {
                           avatarUrl: event.target.value,
                         }))
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
                       placeholder="https://example.com/avatar.png"
                     />
                   </div>
@@ -259,7 +259,7 @@ export default function ProfilePage() {
                     <button
                       onClick={handleSaveProfile}
                       disabled={saving}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-60"
+                      className="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-800 disabled:opacity-60"
                     >
                       {saving ? 'Saving...' : 'Save Changes'}
                     </button>
@@ -290,7 +290,7 @@ export default function ProfilePage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Contribution Stats</h2>
             <div className="space-y-4">
               <div>
-                <div className="text-3xl font-bold text-blue-600 mb-1">
+                <div className="text-3xl font-bold text-green-700 mb-1">
                   {user.totalReports || 0}
                 </div>
                 <div className="text-sm text-gray-600">Total Reports</div>
@@ -303,7 +303,7 @@ export default function ProfilePage() {
                   </div>
                   <div className="text-sm text-gray-600">
                     Leaderboard Position{' '}
-                    <Link href="/leaderboard" className="text-blue-600 hover:text-blue-800 text-xs">
+                    <Link href="/leaderboard" className="text-green-700 hover:text-green-900 text-xs">
                       (View)
                     </Link>
                   </div>
@@ -338,7 +338,7 @@ export default function ProfilePage() {
                       <Link
                         key={report.id}
                         href={`/issue/${report.id}`}
-                        className="block text-xs text-gray-600 hover:text-blue-600 transition-colors"
+                        className="block text-xs text-gray-600 hover:text-green-700 transition-colors"
                       >
                         <div className="flex items-center justify-between gap-2">
                           <span className="truncate flex-1">
@@ -358,7 +358,7 @@ export default function ProfilePage() {
                 {recentReports.length > 3 && (
                   <Link
                     href="/me/reports"
-                    className="text-xs text-blue-600 hover:text-blue-800 mt-2 inline-block"
+                    className="text-xs text-green-700 hover:text-green-900 mt-2 inline-block"
                   >
                     View all activity →
                   </Link>

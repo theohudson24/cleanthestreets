@@ -1,38 +1,127 @@
 # CleanTheStreets
 
-A Next.js application that allows users to report and view urban safety issues (like potholes and road hazards) on an interactive map.
+CleanTheStreets is a full-stack urban safety reporting platform for logging, mapping, and tracking potholes and road hazards. The application supports authenticated community reporting, persistent PostgreSQL-backed data storage, an interactive Leaflet/OpenStreetMap interface, profile/report history views, and a leaderboard designed to encourage civic engagement.
+
+This project was built as a UCSC team project and is structured as a production-style Next.js application with API routes serving as the backend.
 
 ## Features
 
-- **Interactive Map**: Built with Leaflet.js to display all reported hazards with markers and popups
-- **Report Submission**: Users can submit reports with photos, descriptions, and automatic location capture
-- **Real-time Updates**: Map automatically refreshes to show new reports
-- **Cloudinary Integration**: Image upload support for report photos
-- **Responsive Design**: Mobile-friendly UI built with Tailwind CSS
+- User account creation, sign-in, sign-out, and secure session cookies
+- Authenticated report submission with issue type, severity, coordinates, address, description, and optional images
+- Interactive map powered by Leaflet and OpenStreetMap
+- Report filtering by category and status
+- User profile with contribution statistics and report history
+- Gamified leaderboard based on submitted reports
+- Admin-capable report status moderation
+- PostgreSQL persistence through Prisma ORM
+- CSRF protection, input validation, password hashing, and rate limiting
+- Docker Compose setup for one-command local full-stack startup
 
-## Getting Started
+## Tech Stack
+
+| Layer | Technology |
+| --- | --- |
+| Frontend | React 19, Next.js 15 App Router, Tailwind CSS |
+| Backend | Next.js API routes, Node.js |
+| Database | PostgreSQL |
+| ORM | Prisma |
+| Authentication | Cookie-based sessions, bcrypt password hashing |
+| Maps | Leaflet, React Leaflet, OpenStreetMap |
+| Media | Cloudinary signed uploads |
+| Tooling | Docker Compose, ESLint, Prisma Migrate |
+
+## Architecture
+
+CleanTheStreets is a monolithic full-stack Next.js application:
+
+- `src/app` contains pages and API routes.
+- `src/components` contains reusable UI components.
+- `src/lib` contains backend helpers for authentication, security, Prisma, validation, reports, and Cloudinary.
+- `prisma/schema.prisma` defines the persistent data model.
+- `prisma/migrations` stores versioned database migrations.
+- `docker-compose.yml` starts the application and database together.
+
+The backend is implemented through Next.js API routes under `src/app/api`. These routes use Prisma to read and write data in PostgreSQL.
+
+## Data Model
+
+The Prisma schema currently defines:
+
+- `User`: authenticated accounts with profile fields and roles.
+- `Session`: hashed session tokens for secure cookie authentication.
+- `Report`: submitted road hazards with coordinates, status, category, severity, and owner.
+- `ReportImage`: optional image metadata linked to reports.
+
+## Quick Start With Docker Compose
+
+This is the recommended way to run the full application locally. It starts both the frontend/backend app and PostgreSQL.
 
 ### Prerequisites
 
-- Node.js 18+ and npm/yarn/pnpm
-- A Cloudinary account (for image uploads)
+- Docker Desktop
+- Git
 
-### Installation
+### Run The App
 
-1. Clone the repository and install dependencies:
+From the `cleanthestreets` project directory:
 
 ```bash
-npm install
+docker compose up --build
 ```
 
-2. Set up Cloudinary (optional for MVP - image upload will work with configuration):
+After the first build, future starts can usually use:
 
-   - Create a free account at [Cloudinary](https://cloudinary.com)
-   - Copy your Cloud Name from the dashboard
-   - Create an API key and secret in the Cloudinary console
-   - Optionally configure a folder for report uploads such as `cleanthestreets/reports`
+```bash
+docker compose up
+```
 
-3. Create a `.env.local` file in the root directory and set local values (DO NOT commit `.env.local`):
+Then open:
+
+```text
+http://localhost:3000
+```
+
+When the app container starts, it automatically:
+
+1. Waits for PostgreSQL to become healthy.
+2. Runs `prisma migrate deploy`.
+3. Runs the idempotent seed script.
+4. Starts the Next.js production server on port `3000`.
+
+### Docker Commands
+
+```bash
+docker compose ps
+docker compose logs -f app
+docker compose logs -f db
+docker compose down
+```
+
+To remove the local database volume and reset all local Docker data:
+
+```bash
+docker compose down -v
+```
+
+## Local Development Without Containerizing The App
+
+Use this flow if you want hot reload with `npm run dev` while still using Docker for PostgreSQL.
+
+### Prerequisites
+
+- Node.js 18 or newer
+- npm
+- Docker Desktop
+
+### Environment Variables
+
+Create `.env.local` from `.env.example`:
+
+```bash
+cp .env.example .env.local
+```
+
+For local development, the database URL should point to the host-mapped Postgres port:
 
 ```env
 DATABASE_URL="postgresql://postgres:password@localhost:5432/cleanthestreets_dev"
@@ -42,35 +131,12 @@ CLOUDINARY_API_SECRET="your-cloudinary-api-secret"
 CLOUDINARY_UPLOAD_FOLDER="cleanthestreets/reports"
 ```
 
-4. Start the local Postgres database (Docker Compose):
+Cloudinary values are only required for signed image uploads. Core account, map, report, profile, and leaderboard workflows can be tested without image upload configuration.
+
+### Install And Start
 
 ```bash
-npm run db:up
-```
-
-5. Test the DB connection and apply Prisma migrations (first-time setup):
-
-```bash
-npm run db:test       # checks the DATABASE_URL can connect
-npm run prisma:migrate
-npm run prisma:generate
-npm run prisma:seed   # optional: seed sample data
-npm run prisma:studio # inspect data in a GUI
-```
-
-6. Run the development server:
-
-```bash
-npm run dev
-```
-
-7. Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## Local Startup
-
-For normal local development, start the app in this order:
-
-```bash
+npm install
 npm run db:up
 npm run db:test
 npm run prisma:migrate
@@ -79,130 +145,152 @@ npm run prisma:seed
 npm run dev
 ```
 
-Notes:
+Open:
 
-- `npm run db:up` starts the Postgres Docker container.
-- `npm run db:test` verifies Postgres is reachable using `DATABASE_URL`.
-- `npm run prisma:migrate` applies schema changes to the local database.
-- `npm run prisma:generate` rebuilds the Prisma client your app imports.
-- `npm run prisma:seed` inserts local test users and sample records.
-- `npm run dev` starts the Next.js app at `http://localhost:3000`.
-
-If you are just restarting development and the schema has not changed, the shorter flow is usually enough:
-
-```bash
-npm run db:up
-npm run dev
+```text
+http://localhost:3000
 ```
 
-To run the local backend smoke test against a running dev server:
+## Seeded Accounts
+
+The seed script creates local test accounts:
+
+| Role | Email | Password |
+| --- | --- | --- |
+| User | `test@test.com` | `test12345` |
+| Admin | `admin@test.com` | `admin12345` |
+
+These accounts are for local development only.
+
+## Available Scripts
+
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the Next.js development server |
+| `npm run build` | Build the production application |
+| `npm run start` | Start a production build locally |
+| `npm run lint` | Run Next.js linting |
+| `npm run db:up` | Start the PostgreSQL Docker service |
+| `npm run db:down` | Stop Docker Compose services |
+| `npm run db:test` | Verify database connectivity |
+| `npm run prisma:migrate` | Apply Prisma migrations in development |
+| `npm run prisma:generate` | Generate Prisma Client |
+| `npm run prisma:seed` | Seed local users and sample data |
+| `npm run prisma:studio` | Open Prisma Studio |
+| `npm run smoke:local` | Run the local backend smoke test |
+
+## API Overview
+
+| Route | Purpose |
+| --- | --- |
+| `GET /api/auth/csrf` | Issue CSRF token |
+| `POST /api/auth/signup` | Create account |
+| `POST /api/auth/signin` | Sign in |
+| `POST /api/auth/signout` | Sign out |
+| `GET /api/auth/session` | Return current session user |
+| `GET /api/reports` | List reports with filters and pagination |
+| `POST /api/reports` | Create authenticated report |
+| `GET /api/reports/[id]` | Fetch report details |
+| `PATCH /api/reports/[id]` | Update report details or status |
+| `DELETE /api/reports/[id]` | Delete authorized report |
+| `GET /api/me/reports` | List reports for current user |
+| `GET /api/profile` | Fetch current user's profile and stats |
+| `PATCH /api/profile` | Update current user's profile |
+| `GET /api/leaderboard` | Return ranked contributors |
+| `POST /api/uploads/signature` | Create signed Cloudinary upload parameters |
+
+## Security Notes
+
+- Passwords are hashed with bcrypt before storage.
+- Session cookies are HTTP-only and store random session tokens, while only token hashes are persisted.
+- Mutating API routes require CSRF validation.
+- Zod schemas validate request bodies and query parameters.
+- Rate limiting is applied to sensitive actions such as sign-in, sign-up, report creation, and profile updates.
+- Real credentials should never be committed. Keep `.env.local` private.
+
+## Testing
+
+Run the full backend smoke test against a running local app:
 
 ```bash
 npm run smoke:local
 ```
 
-This verifies signup, session creation, CSRF enforcement, profile loading, request validation, report creation, ownership rules, leaderboard access, rate limiting, and signout.
+The smoke test verifies:
 
-## Viewing Database Data
+- CSRF bootstrap and enforcement
+- Signup and session creation
+- Profile fetch, update, and validation
+- Report creation, validation, update, and listing
+- User-specific report history
+- Leaderboard access
+- Ownership and admin authorization rules
+- Signout and session clearing
+- Rate limiting
 
-The easiest way to inspect the database is Prisma Studio:
+## Database Inspection
+
+Open Prisma Studio:
 
 ```bash
 npm run prisma:studio
 ```
 
-That opens a browser UI where you can view and edit `User`, `Report`, and `ReportImage` records.
-
-If you want direct SQL access through Docker:
+Or connect directly to the Dockerized database:
 
 ```bash
 docker compose exec db psql -U postgres -d cleanthestreets_dev
 ```
 
-Useful `psql` commands:
+Useful SQL:
 
 ```sql
 \dt
 SELECT * FROM "User";
 SELECT * FROM "Report";
 SELECT * FROM "ReportImage";
+SELECT * FROM "Session";
 ```
 
 ## Project Structure
 
-```
-src/
-├── app/
-│   ├── api/
-│   │   └── reports/          # API routes for reports
-│   ├── map/                   # Map page
-│   ├── report/                # Report submission page
-│   ├── layout.js              # Root layout with navigation
-│   └── page.js                # Home page
-├── components/
-│   ├── Map.js                 # Leaflet map component
-│   ├── ReportForm.js          # Report submission form
-│   └── navigatiorbar.js       # Navigation bar
-└── styles/
-    └── globals.css            # Global styles
-```
-
-## Usage
-
-1. **View the Map**: Navigate to `/map` to see all reported issues
-2. **Report an Issue**:
-   - Go to `/report`
-   - Fill out the form with issue type, description, and optional photo
-   - Click "Capture My Location" or allow browser location access
-   - Submit the report
-3. **View Reports**: Click on any marker on the map to see report details
-
-## API Routes
-
-The app includes API routes at `/api/reports`:
-
-- `GET /api/reports` - Fetch all reports
-- `POST /api/reports` - Create a new report
-
-**Note**: The API is now backed by **Postgres + Prisma** for persistent storage in local development. See the "Database (Postgres + Prisma)" steps above to set up a local database. For production, configure a managed Postgres instance and set `DATABASE_URL` accordingly.
-
-## Technologies
-
-- **Next.js 15** - React framework
-- **React 19** - UI library
-- **Leaflet.js** - Interactive maps
-- **Tailwind CSS** - Styling
-- **Cloudinary** - Image hosting
-- **Postgres + Prisma** - Local database and ORM for persistent storage (dev)
-
-## Learn More
-
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Leaflet.js Documentation](https://leafletjs.com/)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-
-## Security & Secrets ⚠️
-
-- Keep any real credentials out of the repository. Create a local `.env.local` from `.env.example` and never commit it.
-- The backend now uses secure session cookies, CSRF tokens for mutating requests, request validation, rate limiting, and signed Cloudinary upload parameters.
-- Review [docs/security-operations.md](./docs/security-operations.md) for current controls, backup guidance, and secret-rotation expectations.
-- If you accidentally committed a `.env` file with secrets, remove it from the repository history or at minimum untrack it locally:
-
-```bash
-# stop tracking the file (keeps the file locally)
-git rm --cached .env
-git commit -m "remove tracked .env"
+```text
+cleanthestreets/
+├── prisma/
+│   ├── migrations/
+│   ├── schema.prisma
+│   └── seed.js
+├── scripts/
+│   ├── local-smoke-test.js
+│   ├── prisma-cli.js
+│   └── test-db-connection.js
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   ├── map/
+│   │   ├── profile/
+│   │   ├── report/
+│   │   ├── signin/
+│   │   └── signup/
+│   ├── components/
+│   ├── data/
+│   ├── lib/
+│   └── styles/
+├── Dockerfile
+├── docker-compose.yml
+└── package.json
 ```
 
-- Make sure `.env*` and other local runtime files are ignored (this repo already includes `.env*` patterns in `.gitignore`).
+## Deployment Notes
 
-## Deploy on Vercel
+For production deployment:
 
-The easiest way to deploy your Next.js app is using the [Vercel Platform](https://vercel.com/new):
+- Use a managed PostgreSQL database and set `DATABASE_URL`.
+- Configure Cloudinary credentials for image uploads.
+- Run Prisma migrations during deployment with `prisma migrate deploy`.
+- Use HTTPS so secure cookies and browser geolocation work correctly.
+- Store secrets in the deployment platform's environment variable manager.
 
-1. Push your code to GitHub
-2. Import your repository in Vercel
-3. Add your environment variables
-4. Deploy!
+## License
 
-Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project was created for academic/team portfolio use. Add a license before distributing or accepting external contributions.

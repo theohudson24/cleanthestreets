@@ -16,5 +16,22 @@ services:
       timeout: 5s
       retries: 10
 
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://postgres:password@db:5432/cleanthestreets_dev
+      NEXT_TELEMETRY_DISABLED: "1"
+      COOKIE_SECURE: "false"
+      APP_ORIGIN: http://localhost:3000
+    ports:
+      - "3000:3000"
+
 volumes:
   pgdata:

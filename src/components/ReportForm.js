@@ -240,7 +240,7 @@ export default function ReportForm() {
                   }
                 }}
                 disabled={locationStatus === 'loading'}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 disabled:opacity-50"
+                className="px-4 py-2 bg-green-700 text-white rounded-md shadow-sm hover:bg-green-800 disabled:opacity-50"
               >
                 {locationStatus === 'loading' ? (
                   <span className="flex items-center">
@@ -259,8 +259,8 @@ export default function ReportForm() {
                 onClick={toggleMap}
                 className={`px-4 py-2 rounded-md shadow-sm font-semibold transition-colors ${
                   showMap
-                    ? 'bg-gradient-to-r from-red-600 to-rose-500 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'border border-green-700 bg-white text-green-700'
+                    : 'bg-green-50 text-green-700 hover:bg-green-100'
                 }`}
               >
                 {showMap ? 'Hide Map' : 'Choose on Map'}
@@ -417,7 +417,7 @@ export default function ReportForm() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-60"
+          className="px-6 py-3 bg-green-700 text-white rounded-lg hover:bg-green-800 disabled:opacity-60"
         >
           {isSubmitting ? 'Submitting...' : 'Submit Report'}
         </button>

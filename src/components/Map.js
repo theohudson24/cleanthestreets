@@ -55,7 +55,7 @@ export default function Map({ reports = [], onMarkerClick, onMapClick, center: p
   const getStatusColor = (status) => {
     switch (status) {
       case 'reported':
-        return 'bg-blue-500';
+        return 'bg-green-600';
       case 'in_progress':
         return 'bg-yellow-500';
       case 'fixed':
@@ -81,7 +81,7 @@ export default function Map({ reports = [], onMarkerClick, onMapClick, center: p
   if (loading) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700"></div>
       </div>
     );
   }

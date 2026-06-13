@@ -26,7 +26,7 @@ export default function ContributionStatsBar({ stats }) {
       <div className="w-full bg-gray-200 rounded-full h-3 flex overflow-hidden">
         {reported > 0 && (
           <div
-            className="bg-blue-500"
+            className="bg-green-600"
             style={{ width: `${reportedPercent}%` }}
             title={`Reported: ${reported}`}
           ></div>

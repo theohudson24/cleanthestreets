@@ -25,7 +25,7 @@ export default function LevelUpToast({ level, onClose, duration = 5000 }) {
         <p className="text-xl text-gray-600 mb-4">You&apos;ve reached Level {level}</p>
         <button
           onClick={onClose}
-          className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          className="px-6 py-2 bg-green-700 text-white rounded-md hover:bg-green-800"
         >
           Awesome!
         </button>

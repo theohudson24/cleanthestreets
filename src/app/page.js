@@ -48,7 +48,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900 text-slate-100">
+    <div className="min-h-screen bg-white text-gray-900">
       {/* main content sits under your existing global navbar */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Main layout: hero + stats card */}
@@ -56,10 +56,10 @@ export default function Home() {
           {/* Left: Hero + search + primary actions */}
           <section>
             <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight mb-4">
-              <span className="text-slate-100">Make your streets</span>
-              <span className="block bg-gradient-to-r from-indigo-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent drop-shadow">safer and smoother.</span>
+              <span className="text-gray-900">Make your streets</span>
+              <span className="block text-green-700">safer and smoother.</span>
             </h1>
-            <p className="text-base sm:text-lg text-slate-300 max-w-xl mb-6">
+            <p className="text-base sm:text-lg text-gray-600 max-w-xl mb-6">
               Report potholes and road hazards in seconds. Track fixes over time and
               climb the community leaderboard as a neighborhood hero.
             </p>
@@ -68,13 +68,13 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-3 mb-8">
               <Link
                 href="/report"
-                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-indigo-500 to-blue-500 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-blue-500/25 hover:brightness-110 transition"
+                className="inline-flex items-center justify-center rounded-full bg-green-700 px-6 py-3 text-sm font-medium text-white hover:bg-green-800 transition"
               >
                 Report an issue
               </Link>
               <Link
                 href="/map"
-                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-indigo-500 to-blue-500 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-blue-500/25 hover:brightness-110 transition"
+                className="inline-flex items-center justify-center rounded-full border border-green-700 px-6 py-3 text-sm font-medium text-green-700 hover:bg-green-50 transition"
               >
                 Open map
               </Link>
@@ -84,23 +84,23 @@ export default function Home() {
             <div className="max-w-xl">
               <form
                 onSubmit={handleSearch}
-                className="flex items-center gap-2 rounded-2xl border border-white/10 bg-slate-900/70 px-3 py-2 shadow-[0_15px_40px_rgba(0,0,0,0.45)] backdrop-blur"
+                className="flex items-center gap-2 rounded-2xl border border-green-100 bg-white px-3 py-2 shadow-sm"
               >
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search for an address or place…"
-                  className="flex-1 border-none bg-transparent px-2 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-0"
+                  className="flex-1 border-none bg-transparent px-2 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0"
                 />
                 <button
                   type="submit"
-                  className="inline-flex items-center rounded-full bg-gradient-to-r from-indigo-500 to-blue-500 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-blue-500/20 hover:brightness-110 transition"
+                  className="inline-flex items-center rounded-full bg-green-700 px-4 py-2 text-xs font-semibold text-white hover:bg-green-800 transition"
                 >
                   Search
                 </button>
               </form>
-              <p className="mt-2 text-xs text-slate-400">
+              <p className="mt-2 text-xs text-gray-500">
                 Try a street name, intersection, or neighborhood.
               </p>
             </div>
@@ -108,41 +108,41 @@ export default function Home() {
 
           {/* Right: Stats card */}
           <aside>
-            <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-5 shadow-[0_18px_50px_rgba(0,0,0,0.4)] backdrop-blur">
+            <div className="rounded-2xl border border-green-100 bg-white p-5 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-sm font-semibold text-slate-50">This week at a glance</h2>
-                  <p className="text-xs text-slate-400">Live stats from community reports.</p>
+                  <h2 className="text-sm font-semibold text-gray-900">This week at a glance</h2>
+                  <p className="text-xs text-gray-500">Live stats from community reports.</p>
                 </div>
-                <span className="rounded-full border border-red-300/40 bg-red-500/20 px-3 py-1 text-[11px] font-semibold text-white shadow-[0_0_0_1px_rgba(252,165,165,0.12),0_0_32px_rgba(239,68,68,0.28)] animate-[pulse_2.8s_ease-in-out_infinite]">
+                <span className="rounded-full border border-green-200 bg-green-50 px-3 py-1 text-[11px] font-semibold text-green-700">
                   Updated in real time
                 </span>
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-                  <div className="text-[11px] font-semibold text-slate-300 mb-2">Total reports</div>
-                  <div className="text-2xl font-semibold text-slate-50 leading-tight">
+                <div className="rounded-xl border border-green-100 bg-green-50 p-3">
+                  <div className="text-[11px] font-semibold text-gray-600 mb-2">Total reports</div>
+                  <div className="text-2xl font-semibold text-gray-900 leading-tight">
                     {loading ? <LoadingSpinner size="sm" className="mx-auto" /> : stats.total ?? '—'}
                   </div>
                 </div>
-                <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-                  <div className="text-[11px] font-semibold text-slate-300 mb-2">Fixed issues</div>
-                  <div className="text-2xl font-semibold text-emerald-300 leading-tight">
+                <div className="rounded-xl border border-green-100 bg-green-50 p-3">
+                  <div className="text-[11px] font-semibold text-gray-600 mb-2">Fixed issues</div>
+                  <div className="text-2xl font-semibold text-green-700 leading-tight">
                     {loading ? <LoadingSpinner size="sm" className="mx-auto" /> : stats.fixed ?? '—'}
                   </div>
                 </div>
-                <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-                  <div className="text-[11px] font-semibold text-slate-300 mb-2">Last 7 days</div>
-                  <div className="text-2xl font-semibold text-amber-300 leading-tight">
+                <div className="rounded-xl border border-green-100 bg-green-50 p-3">
+                  <div className="text-[11px] font-semibold text-gray-600 mb-2">Last 7 days</div>
+                  <div className="text-2xl font-semibold text-green-600 leading-tight">
                     {loading ? <LoadingSpinner size="sm" className="mx-auto" /> : stats.recent ?? '—'}
                   </div>
                 </div>
               </div>
 
-              <div className="mt-5 rounded-xl border border-dashed border-white/15 bg-slate-900/50 p-4">
-                <p className="text-xs text-slate-300 mb-1">Want to see where these reports are coming from?</p>
-                <Link href="/leaderboard" className="text-xs font-semibold text-indigo-200 hover:text-white">
+              <div className="mt-5 rounded-xl border border-dashed border-green-200 bg-green-50 p-4">
+                <p className="text-xs text-gray-600 mb-1">Want to see where these reports are coming from?</p>
+                <Link href="/leaderboard" className="text-xs font-semibold text-green-700 hover:text-green-900">
                   View community leaderboard →
                 </Link>
               </div>
@@ -152,13 +152,13 @@ export default function Home() {
 
         {/* How it works – Linear-inspired glass */}
         <section className="mt-16">
-          <div className="rounded-3xl border border-white/10 bg-slate-900/65 text-slate-100 p-6 sm:p-8 shadow-[0_18px_50px_rgba(0,0,0,0.45)] backdrop-blur">
+          <div className="rounded-3xl border border-green-100 bg-white text-gray-900 p-6 sm:p-8 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-lg sm:text-xl font-semibold text-slate-50">How it works</h2>
-                <p className="text-xs sm:text-sm text-slate-300">Three simple steps to make your neighborhood safer.</p>
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">How it works</h2>
+                <p className="text-xs sm:text-sm text-gray-600">Three simple steps to make your neighborhood safer.</p>
               </div>
-              <span className="hidden sm:inline-flex items-center rounded-full bg-white/5 px-3 py-1 text-[11px] font-semibold text-slate-100 border border-white/10">
+              <span className="hidden sm:inline-flex items-center rounded-full bg-green-50 px-3 py-1 text-[11px] font-semibold text-green-700 border border-green-100">
                 Built for quick, repeat reporting
               </span>
             </div>
@@ -168,12 +168,12 @@ export default function Home() {
                 {/* Step 1 */}
                 <div className="relative flex flex-col gap-2">
                   <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-sm font-semibold shadow-md shadow-blue-500/25">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-green-700 text-white text-sm font-semibold">
                       1
                     </span>
-                    <h3 className="text-base font-semibold text-slate-50">Report an issue</h3>
+                    <h3 className="text-base font-semibold text-gray-900">Report an issue</h3>
                   </div>
-                  <p className="text-sm text-slate-200">
+                  <p className="text-sm text-gray-600">
                     Snap a photo, drop a pin on the map, and submit a quick report with location and severity.
                   </p>
                 </div>
@@ -181,12 +181,12 @@ export default function Home() {
                 {/* Step 2 */}
                 <div className="relative flex flex-col gap-2">
                   <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-sm font-semibold shadow-md shadow-blue-500/25">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-green-700 text-white text-sm font-semibold">
                       2
                     </span>
-                    <h3 className="text-base font-semibold text-slate-50">Track progress</h3>
+                    <h3 className="text-base font-semibold text-gray-900">Track progress</h3>
                   </div>
-                  <p className="text-sm text-slate-200">
+                  <p className="text-sm text-gray-600">
                     See every report on the map, follow its status, and understand what&apos;s been scheduled or fixed.
                   </p>
                 </div>
@@ -194,12 +194,12 @@ export default function Home() {
                 {/* Step 3 */}
                 <div className="relative flex flex-col gap-2">
                   <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-sm font-semibold shadow-md shadow-blue-500/25">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-green-700 text-white text-sm font-semibold">
                       3
                     </span>
-                    <h3 className="text-base font-semibold text-slate-50">Earn recognition</h3>
+                    <h3 className="text-base font-semibold text-gray-900">Earn recognition</h3>
                   </div>
-                  <p className="text-sm text-slate-200">
+                  <p className="text-sm text-gray-600">
                     Climb the leaderboard, unlock badges, and build a history of the hazards you&apos;ve helped resolve.
                   </p>
                 </div>
