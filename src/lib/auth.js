@@ -30,6 +30,8 @@ export function toPublicUser(user) {
     avatarUrl: user.avatarUrl,
     bio: user.bio,
     location: user.location,
+    themePreference: user.themePreference,
+    passwordUpdatedAt: user.passwordUpdatedAt,
     role: user.role,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,

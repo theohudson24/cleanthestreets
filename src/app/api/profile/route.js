@@ -9,7 +9,7 @@ import {
 } from "@/lib/security";
 import { profileUpdateSchema } from "@/lib/validation";
 
-function buildProfile(user, totalReports, fixedReports, groupedByStatus) {
+function buildProfile(user, totalReports, groupedByStatus) {
   const reportStats = {
     reported: 0,
     in_progress: 0,
@@ -31,8 +31,9 @@ function buildProfile(user, totalReports, fixedReports, groupedByStatus) {
     location: user.location,
     role: user.role,
     memberSince: user.createdAt,
+    themePreference: user.themePreference,
+    passwordUpdatedAt: user.passwordUpdatedAt,
     totalReports,
-    fixedRate: totalReports > 0 ? Math.round((fixedReports / totalReports) * 100) : 0,
     reportStats,
   };
 }
@@ -44,9 +45,8 @@ export async function GET(request) {
       return auth.response;
     }
 
-    const [totalReports, fixedReports, groupedByStatus] = await Promise.all([
+    const [totalReports, groupedByStatus] = await Promise.all([
       prisma.report.count({ where: { userId: auth.user.id } }),
-      prisma.report.count({ where: { userId: auth.user.id, status: "fixed" } }),
       prisma.report.groupBy({
         by: ["status"],
         where: { userId: auth.user.id },
@@ -55,7 +55,7 @@ export async function GET(request) {
     ]);
 
     return Response.json(
-      buildProfile(auth.user, totalReports, fixedReports, groupedByStatus)
+      buildProfile(auth.user, totalReports, groupedByStatus)
     );
   } catch (error) {
     return toErrorResponse(error, "Failed to fetch profile");
@@ -85,7 +85,7 @@ export async function PATCH(request) {
       return rateLimitResponse;
     }
 
-    const { displayName, bio, location, avatarUrl } = await readValidatedJson(
+    const { displayName, bio, location, avatarUrl, themePreference } = await readValidatedJson(
       request,
       profileUpdateSchema
     );
@@ -97,12 +97,12 @@ export async function PATCH(request) {
         bio,
         location,
         avatarUrl,
+        ...(themePreference ? { themePreference } : {}),
       },
     });
 
-    const [totalReports, fixedReports, groupedByStatus] = await Promise.all([
+    const [totalReports, groupedByStatus] = await Promise.all([
       prisma.report.count({ where: { userId: auth.user.id } }),
-      prisma.report.count({ where: { userId: auth.user.id, status: "fixed" } }),
       prisma.report.groupBy({
         by: ["status"],
         where: { userId: auth.user.id },
@@ -111,7 +111,7 @@ export async function PATCH(request) {
     ]);
 
     return Response.json(
-      buildProfile(updatedUser, totalReports, fixedReports, groupedByStatus)
+      buildProfile(updatedUser, totalReports, groupedByStatus)
     );
   } catch (error) {
     if (!(error?.issues)) {

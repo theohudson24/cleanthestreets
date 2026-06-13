@@ -1,57 +1,45 @@
 'use client';
 
+const STATUS_ITEMS = [
+  {
+    key: 'reported',
+    label: 'Reported',
+    helper: 'Awaiting review',
+    className: 'border-green-100 bg-green-50 text-green-800',
+  },
+  {
+    key: 'in_progress',
+    label: 'In Progress',
+    helper: 'Being addressed',
+    className: 'border-green-200 bg-white text-gray-800',
+  },
+  {
+    key: 'fixed',
+    label: 'Fixed',
+    helper: 'Resolved',
+    className: 'border-green-200 bg-green-100 text-green-900',
+  },
+];
+
 export default function ContributionStatsBar({ stats }) {
-  const { reported, in_progress, fixed } = stats;
-  const total = reported + in_progress + fixed;
-  
-  if (total === 0) {
-    return (
-      <div className="mt-4">
-        <div className="w-full bg-gray-200 rounded-full h-3"></div>
-        <div className="flex justify-between text-xs text-gray-600 mt-2">
-          <span>Reported: 0</span>
-          <span>In Progress: 0</span>
-          <span>Fixed: 0</span>
-        </div>
-      </div>
-    );
-  }
-
-  const reportedPercent = (reported / total) * 100;
-  const inProgressPercent = (in_progress / total) * 100;
-  const fixedPercent = (fixed / total) * 100;
-
   return (
-    <div className="mt-4">
-      <div className="w-full bg-gray-200 rounded-full h-3 flex overflow-hidden">
-        {reported > 0 && (
-          <div
-            className="bg-green-600"
-            style={{ width: `${reportedPercent}%` }}
-            title={`Reported: ${reported}`}
-          ></div>
-        )}
-        {in_progress > 0 && (
-          <div
-            className="bg-yellow-500"
-            style={{ width: `${inProgressPercent}%` }}
-            title={`In Progress: ${in_progress}`}
-          ></div>
-        )}
-        {fixed > 0 && (
-          <div
-            className="bg-green-500"
-            style={{ width: `${fixedPercent}%` }}
-            title={`Fixed: ${fixed}`}
-          ></div>
-        )}
-      </div>
-      <div className="flex justify-between text-xs text-gray-600 mt-2">
-        <span>Reported: {reported}</span>
-        <span>In Progress: {in_progress}</span>
-        <span>Fixed: {fixed}</span>
-      </div>
+    <div className="grid gap-3">
+      {STATUS_ITEMS.map((item) => (
+        <div
+          key={item.key}
+          className={`rounded-lg border p-4 ${item.className}`}
+        >
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <div className="text-sm font-semibold">{item.label}</div>
+              <div className="mt-1 text-xs opacity-80">{item.helper}</div>
+            </div>
+            <div className="text-2xl font-semibold leading-none">
+              {stats?.[item.key] || 0}
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
-

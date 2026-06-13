@@ -27,18 +27,20 @@ enum ReportStatus {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  passwordHash String
-  displayName  String
-  avatarUrl    String?
-  bio          String?
-  location     String?
-  role         UserRole @default(user)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  reports      Report[]
-  sessions     Session[]
+  id                String   @id @default(cuid())
+  email             String   @unique
+  passwordHash      String
+  passwordUpdatedAt DateTime @default(now())
+  displayName       String
+  avatarUrl         String?
+  bio               String?
+  location          String?
+  themePreference   String   @default("light")
+  role              UserRole @default(user)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  reports           Report[]
+  sessions          Session[]
 }
 
 model Report {

@@ -9,8 +9,9 @@ export const ISSUE_TYPES = [
 ];
 
 export const REPORT_STATUSES = ["reported", "in_progress", "fixed"];
+export const THEME_PREFERENCES = ["light", "dark"];
 
-const passwordSchema = z
+export const passwordSchema = z
   .string()
   .min(8, "Password must be at least 8 characters long.")
   .max(128, "Password must be 128 characters or fewer.")
@@ -66,8 +67,20 @@ export const profileUpdateSchema = z
     bio: trimmedOptionalString(280),
     location: trimmedOptionalString(120),
     avatarUrl: nullableHttpsUrl,
+    themePreference: z.enum(THEME_PREFERENCES).optional(),
   })
   .strict();
+
+export const passwordChangeSchema = z
+  .object({
+    currentPassword: z.string().min(8).max(128),
+    newPassword: passwordSchema,
+  })
+  .strict()
+  .refine((value) => value.currentPassword !== value.newPassword, {
+    message: "New password must be different from your current password.",
+    path: ["newPassword"],
+  });
 
 const reportImageSchema = z
   .object({

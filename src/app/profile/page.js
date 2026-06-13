@@ -8,6 +8,7 @@ import IssueCard from '@/components/IssueCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import EmptyState from '@/components/EmptyState';
 import ContributionStatsBar from '@/components/ContributionStatsBar';
+import { applyTheme } from '@/components/ThemeProvider';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -22,10 +23,20 @@ export default function ProfilePage() {
     bio: '',
     location: '',
     avatarUrl: '',
+    themePreference: 'light',
+  });
+  const [passwordState, setPasswordState] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
   });
   const [formError, setFormError] = useState(null);
   const [formSuccess, setFormSuccess] = useState(null);
+  const [settingsError, setSettingsError] = useState(null);
+  const [settingsSuccess, setSettingsSuccess] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [savingTheme, setSavingTheme] = useState(false);
+  const [savingPassword, setSavingPassword] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -50,7 +61,9 @@ export default function ProfilePage() {
         bio: profileData.bio || '',
         location: profileData.location || '',
         avatarUrl: profileData.avatarUrl || '',
+        themePreference: profileData.themePreference || 'light',
       });
+      applyTheme(profileData.themePreference || 'light');
 
       const [reportsResponse, leaderboardResponse] = await Promise.all([
         fetch('/api/me/reports?limit=5', { cache: 'no-store' }),
@@ -114,6 +127,83 @@ export default function ProfilePage() {
     }
   };
 
+  const handleThemeChange = async (themePreference) => {
+    try {
+      setSavingTheme(true);
+      setSettingsError(null);
+      setSettingsSuccess(null);
+
+      const nextState = { ...formState, themePreference };
+      setFormState(nextState);
+      applyTheme(themePreference);
+      window.localStorage.setItem('cleanthestreets-theme', themePreference);
+
+      const response = await apiFetch('/api/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nextState),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to save theme preference');
+      }
+
+      setUser(data);
+      setSettingsSuccess('Theme preference saved.');
+    } catch (error) {
+      setSettingsError(error.message);
+      const fallbackTheme = user?.themePreference || 'light';
+      setFormState((current) => ({ ...current, themePreference: fallbackTheme }));
+      applyTheme(fallbackTheme);
+    } finally {
+      setSavingTheme(false);
+    }
+  };
+
+  const handlePasswordChange = async (event) => {
+    event.preventDefault();
+    setSettingsError(null);
+    setSettingsSuccess(null);
+
+    if (passwordState.newPassword !== passwordState.confirmPassword) {
+      setSettingsError('New passwords do not match.');
+      return;
+    }
+
+    try {
+      setSavingPassword(true);
+      const response = await apiFetch('/api/profile/password', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword: passwordState.currentPassword,
+          newPassword: passwordState.newPassword,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update password');
+      }
+
+      setUser((current) => ({
+        ...current,
+        passwordUpdatedAt: data.passwordUpdatedAt,
+      }));
+      setPasswordState({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+      setSettingsSuccess('Password updated successfully.');
+    } catch (error) {
+      setSettingsError(error.message);
+    } finally {
+      setSavingPassword(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -133,6 +223,13 @@ export default function ProfilePage() {
         day: 'numeric',
       })
     : null;
+  const passwordUpdatedAt = user.passwordUpdatedAt
+    ? new Date(user.passwordUpdatedAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    : 'Not available';
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
@@ -285,20 +382,23 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 mb-6">
-          <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="grid lg:grid-cols-5 gap-6 mb-6">
+          <div className="bg-white rounded-lg shadow-md p-6 lg:col-span-2">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Contribution Stats</h2>
-            <div className="space-y-4">
-              <div>
-                <div className="text-3xl font-bold text-green-700 mb-1">
+            <div className="space-y-5">
+              <div className="rounded-lg border border-green-100 bg-green-50 p-4">
+                <div className="text-3xl font-bold text-green-800 mb-1">
                   {user.totalReports || 0}
                 </div>
-                <div className="text-sm text-gray-600">Total Reports</div>
+                <div className="text-sm font-medium text-green-900">Total Reports</div>
+                <p className="mt-1 text-xs text-green-800">
+                  Issues you have submitted for community tracking.
+                </p>
               </div>
               {user.reportStats && <ContributionStatsBar stats={user.reportStats} />}
               {leaderboardPosition !== null && (
-                <div>
-                  <div className="text-3xl font-bold text-yellow-600 mb-1">
+                <div className="rounded-lg border border-gray-200 p-4">
+                  <div className="text-2xl font-bold text-green-700 mb-1">
                     #{leaderboardPosition}
                   </div>
                   <div className="text-sm text-gray-600">
@@ -309,68 +409,156 @@ export default function ProfilePage() {
                   </div>
                 </div>
               )}
-              <div>
-                <div className="text-3xl font-bold text-green-600 mb-1">
-                  {user.fixedRate ?? 0}%
-                </div>
-                <div className="text-sm text-gray-600">Fixed Rate</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Account</h2>
-            <div className="space-y-3">
               <Link
                 href="/me/reports"
-                className="block px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                className="block rounded-lg border border-green-200 bg-white px-4 py-3 text-sm font-medium text-green-800 hover:bg-green-50 transition-colors"
               >
                 My Reports
               </Link>
+            </div>
+          </div>
 
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">Recent Activity</h3>
-                {recentReports.length === 0 ? (
-                  <p className="text-xs text-gray-500 mb-2">No recent activity</p>
-                ) : (
-                  <div className="space-y-2">
-                    {recentReports.slice(0, 3).map((report) => (
-                      <Link
-                        key={report.id}
-                        href={`/issue/${report.id}`}
-                        className="block text-xs text-gray-600 hover:text-green-700 transition-colors"
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="truncate flex-1">
-                            {report.issueType?.replace('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()) || 'Issue'}
-                          </span>
-                          <span className="text-gray-400">
-                            {new Date(report.createdAt).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                            })}
-                          </span>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-                {recentReports.length > 3 && (
-                  <Link
-                    href="/me/reports"
-                    className="text-xs text-green-700 hover:text-green-900 mt-2 inline-block"
-                  >
-                    View all activity →
-                  </Link>
-                )}
+          <div className="bg-white rounded-lg shadow-md p-6 lg:col-span-3">
+            <div className="flex flex-col gap-1 mb-5">
+              <h2 className="text-lg font-semibold text-gray-900">Account Settings</h2>
+              <p className="text-sm text-gray-600">
+                Manage your password, appearance, and account session.
+              </p>
+            </div>
+
+            {settingsError && (
+              <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                {settingsError}
               </div>
+            )}
 
-              <button
-                onClick={() => setShowSignOutConfirm(true)}
-                className="w-full px-4 py-2 bg-red-900/70 text-red-100 border border-red-500/40 rounded-md hover:bg-red-900 mt-4 transition-colors"
-              >
-                Sign Out
-              </button>
+            {settingsSuccess && (
+              <div className="mb-4 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
+                {settingsSuccess}
+              </div>
+            )}
+
+            <div className="space-y-6">
+              <section>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900">Theme</h3>
+                    <p className="text-xs text-gray-500">
+                      Your theme preference is saved to your account.
+                    </p>
+                  </div>
+                  {savingTheme && <span className="text-xs text-gray-500">Saving...</span>}
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-2 rounded-lg border border-gray-200 bg-gray-50 p-1">
+                  {[
+                    { value: 'light', label: 'Light' },
+                    { value: 'dark', label: 'Dark' },
+                  ].map((theme) => {
+                    const isSelected = formState.themePreference === theme.value;
+
+                    return (
+                      <button
+                        key={theme.value}
+                        type="button"
+                        onClick={() => handleThemeChange(theme.value)}
+                        disabled={savingTheme || isSelected}
+                        className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                          isSelected
+                            ? 'bg-green-700 text-white shadow-sm'
+                            : 'text-gray-700 hover:bg-white'
+                        }`}
+                      >
+                        {theme.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+
+              <section className="border-t border-gray-200 pt-5">
+                <div className="mb-3">
+                  <h3 className="text-sm font-semibold text-gray-900">Change Password</h3>
+                  <p className="text-xs text-gray-500">
+                    Last updated: {passwordUpdatedAt}
+                  </p>
+                </div>
+                <form onSubmit={handlePasswordChange} className="grid gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Current Password
+                    </label>
+                    <input
+                      type="password"
+                      value={passwordState.currentPassword}
+                      onChange={(event) =>
+                        setPasswordState((current) => ({
+                          ...current,
+                          currentPassword: event.target.value,
+                        }))
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
+                      autoComplete="current-password"
+                    />
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        New Password
+                      </label>
+                      <input
+                        type="password"
+                        value={passwordState.newPassword}
+                        onChange={(event) =>
+                          setPasswordState((current) => ({
+                            ...current,
+                            newPassword: event.target.value,
+                          }))
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
+                        autoComplete="new-password"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        Confirm New Password
+                      </label>
+                      <input
+                        type="password"
+                        value={passwordState.confirmPassword}
+                        onChange={(event) =>
+                          setPasswordState((current) => ({
+                            ...current,
+                            confirmPassword: event.target.value,
+                          }))
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
+                        autoComplete="new-password"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={
+                      savingPassword ||
+                      !passwordState.currentPassword ||
+                      !passwordState.newPassword ||
+                      !passwordState.confirmPassword
+                    }
+                    className="w-full sm:w-auto sm:justify-self-start px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-800 disabled:opacity-60"
+                  >
+                    {savingPassword ? 'Updating...' : 'Update Password'}
+                  </button>
+                </form>
+              </section>
+
+              <section className="border-t border-gray-200 pt-5">
+                <button
+                  onClick={() => setShowSignOutConfirm(true)}
+                  className="w-full px-4 py-2 bg-red-900/70 text-red-100 border border-red-500/40 rounded-md hover:bg-red-900 transition-colors"
+                >
+                  Sign Out
+                </button>
+              </section>
             </div>
           </div>
         </div>

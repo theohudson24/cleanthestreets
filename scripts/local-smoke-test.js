@@ -140,6 +140,7 @@ function assert(condition, message) {
         bio: "Updated via smoke test",
         location: "Los Angeles, CA",
         avatarUrl: "",
+        themePreference: "dark",
       }),
     },
     userCookies
@@ -151,6 +152,24 @@ function assert(condition, message) {
   );
   console.log("✓ profile update");
 
+  assert(updatedProfile.data.themePreference === "dark", "Theme preference did not persist");
+
+  const passwordUpdate = await request(
+    "/api/profile/password",
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        currentPassword: "SmokeTest123!",
+        newPassword: "SmokeTest456!",
+      }),
+    },
+    userCookies
+  );
+  assert(passwordUpdate.response.ok, "Password update failed");
+  assert(passwordUpdate.data.passwordUpdatedAt, "Password update timestamp missing");
+  console.log("password update passed");
+
   const invalidProfile = await request(
     "/api/profile",
     {
@@ -161,6 +180,7 @@ function assert(condition, message) {
         bio: "",
         location: "",
         avatarUrl: "",
+        themePreference: "light",
       }),
     },
     userCookies

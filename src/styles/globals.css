@@ -22,6 +22,23 @@ for some elements */
   --font-geist-mono: "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
 }
 
+:root[data-theme='dark'] {
+  --theme-bg: #141816;
+  --theme-bg-alt: #1b211d;
+  --theme-card: #202620;
+  --theme-card-soft: #18251c;
+  --theme-border: #334238;
+  --theme-highlight: #14532d;
+  --theme-text: #eef7f0;
+  --theme-text-soft: #c5d6ca;
+  --theme-text-muted: #91a696;
+  --theme-accent: #22c55e;
+  --theme-accent-strong: #4ade80;
+  --theme-accent-soft: #163c24;
+  --theme-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  color-scheme: dark;
+}
+
 body {
   background: var(--theme-bg);
   color: var(--theme-text);
@@ -42,7 +59,7 @@ a {
 input:not([type='range']),
 textarea,
 select {
-  background-color: #ffffff;
+  background-color: var(--theme-card);
   border: 1px solid var(--theme-border);
   color: var(--theme-text);
   border-radius: 0.75rem;
@@ -69,6 +86,54 @@ button {
 
 .bg-gray-200 {
   background-color: #e5efe9 !important;
+}
+
+:root[data-theme='dark'] .bg-white,
+:root[data-theme='dark'] .bg-gray-50,
+:root[data-theme='dark'] .bg-gray-100 {
+  background-color: var(--theme-card) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text) !important;
+}
+
+:root[data-theme='dark'] .bg-green-50,
+:root[data-theme='dark'] .bg-green-100,
+:root[data-theme='dark'] .bg-gray-100,
+:root[data-theme='dark'] .bg-gray-200 {
+  background-color: var(--theme-card-soft) !important;
+}
+
+:root[data-theme='dark'] .border-green-100,
+:root[data-theme='dark'] .border-green-200,
+:root[data-theme='dark'] .border-gray-200,
+:root[data-theme='dark'] .border-gray-300 {
+  border-color: var(--theme-border) !important;
+}
+
+:root[data-theme='dark'] .text-green-700,
+:root[data-theme='dark'] .text-green-800,
+:root[data-theme='dark'] .text-green-900 {
+  color: var(--theme-accent) !important;
+}
+
+:root[data-theme='dark'] .bg-green-700,
+:root[data-theme='dark'] .bg-green-800 {
+  background-color: #15803d !important;
+}
+
+:root[data-theme='dark'] .hover\:bg-green-50:hover,
+:root[data-theme='dark'] .hover\:bg-green-100:hover,
+:root[data-theme='dark'] .hover\:bg-gray-100:hover,
+:root[data-theme='dark'] .hover\:bg-gray-200:hover {
+  background-color: #243128 !important;
+}
+
+:root[data-theme='dark'] input:not([type='range']),
+:root[data-theme='dark'] textarea,
+:root[data-theme='dark'] select {
+  background-color: #161b18 !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text) !important;
 }
 
 .text-gray-900,
