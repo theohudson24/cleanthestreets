@@ -44,7 +44,7 @@ export function setCsrfCookie(response, token = createCsrfToken()) {
   response.cookies.set(CSRF_COOKIE_NAME, token, {
     httpOnly: false,
     sameSite: "strict",
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookies(),
     path: "/",
   });
 
@@ -55,10 +55,16 @@ export function clearCsrfCookie(response) {
   response.cookies.set(CSRF_COOKIE_NAME, "", {
     httpOnly: false,
     sameSite: "strict",
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookies(),
     expires: new Date(0),
     path: "/",
   });
+}
+
+export function shouldUseSecureCookies() {
+  if (process.env.COOKIE_SECURE === "true") return true;
+  if (process.env.COOKIE_SECURE === "false") return false;
+  return process.env.NODE_ENV === "production";
 }
 
 export function getCsrfToken(request) {
@@ -157,8 +163,10 @@ export function enforceSameOrigin(request) {
   const origin = request.headers.get("origin");
   if (!origin) return null;
 
-  const expectedOrigin = new URL(request.url).origin;
+  const expectedOrigin = getExpectedOrigin(request);
   if (origin === expectedOrigin) return null;
+
+  if (areEquivalentLocalOrigins(origin, expectedOrigin)) return null;
 
   logSecurityEvent("csrf_origin_mismatch", request, {
     origin,
@@ -166,6 +174,54 @@ export function enforceSameOrigin(request) {
   });
 
   return forbiddenError("Cross-site request blocked.");
+}
+
+function getExpectedOrigin(request) {
+  const configuredOrigin = process.env.APP_ORIGIN;
+  if (configuredOrigin) {
+    return configuredOrigin;
+  }
+
+  const forwardedHost = request.headers.get("x-forwarded-host");
+  const host = forwardedHost || request.headers.get("host");
+  if (host) {
+    const forwardedProto = request.headers.get("x-forwarded-proto");
+    const requestProtocol = new URL(request.url).protocol.replace(":", "");
+    const protocol = forwardedProto || requestProtocol || "http";
+    return `${protocol}://${host}`;
+  }
+
+  return new URL(request.url).origin;
+}
+
+function areEquivalentLocalOrigins(origin, expectedOrigin) {
+  try {
+    const originUrl = new URL(origin);
+    const expectedUrl = new URL(expectedOrigin);
+    const localHosts = new Set([
+      "localhost",
+      "127.0.0.1",
+      "0.0.0.0",
+      "::1",
+      "[::1]",
+    ]);
+
+    return (
+      originUrl.protocol === expectedUrl.protocol &&
+      localHosts.has(originUrl.hostname) &&
+      localHosts.has(expectedUrl.hostname) &&
+      (originUrl.port || defaultPort(originUrl.protocol)) ===
+        (expectedUrl.port || defaultPort(expectedUrl.protocol))
+    );
+  } catch {
+    return false;
+  }
+}
+
+function defaultPort(protocol) {
+  if (protocol === "https:") return "443";
+  if (protocol === "http:") return "80";
+  return "";
 }
 
 export function requireCsrf(request) {

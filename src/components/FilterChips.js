@@ -6,17 +6,17 @@ export default function FilterChips({ filters, onFilterChange, options, variant 
       ? {
           container: 'flex flex-wrap gap-2',
           active:
-            'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-sm shadow-blue-500/30 border border-white/10',
+            'bg-green-700 text-white border border-green-700',
           inactive:
-            'bg-white/5 text-slate-200 border border-white/10 hover:border-blue-400/60 hover:text-white',
+            'bg-white text-gray-700 border border-green-100 hover:bg-green-50 hover:text-green-800',
           base: 'px-4 py-2 rounded-full text-sm font-medium transition-all',
         }
       : {
           container: 'flex flex-wrap gap-2',
           active:
-            'bg-gradient-to-r from-indigo-500 to-blue-500 text-white border border-white/10 shadow-md shadow-indigo-500/30',
+            'bg-green-700 text-white border border-green-700',
           inactive:
-            'glass-chip hover:border-indigo-400/80 hover:text-white hover:bg-indigo-950/30 transition-all',
+            'glass-chip hover:border-green-300 hover:text-green-800 hover:bg-green-50 transition-all',
           base: 'px-4 py-2 rounded-full text-sm font-medium transition-all',
         };
 

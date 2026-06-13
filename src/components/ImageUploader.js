@@ -78,7 +78,7 @@ export default function ImageUploader({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="w-32 h-32 border-2 border-dashed border-gray-300 rounded flex items-center justify-center text-gray-500 hover:border-blue-500 hover:text-blue-500 transition-colors"
+            className="w-32 h-32 border-2 border-dashed border-gray-300 rounded flex items-center justify-center text-gray-500 hover:border-green-500 hover:text-green-700 transition-colors"
           >
             <span className="text-2xl">+</span>
           </button>

@@ -24,6 +24,7 @@ const prismaBin = path.resolve(
 const child = spawn(prismaBin, process.argv.slice(2), {
   stdio: "inherit",
   env: process.env,
+  shell: process.platform === "win32",
 });
 
 child.on("exit", (code, signal) => {

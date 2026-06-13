@@ -143,7 +143,7 @@ export default function IssueDetailsPage() {
 
   if (error === 'not_found') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900 text-slate-100">
+      <div className="min-h-screen bg-white text-gray-900">
         <div className="max-w-2xl mx-auto px-4 py-16 text-center">
           <EmptyState
             title="Report Not Found"
@@ -158,7 +158,7 @@ export default function IssueDetailsPage() {
 
   if (error || !issue) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900 text-slate-100">
+      <div className="min-h-screen bg-white text-gray-900">
         <div className="max-w-2xl mx-auto px-4 py-16 text-center">
           <EmptyState
             title="Error Loading Report"
@@ -172,7 +172,7 @@ export default function IssueDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900 text-slate-100">
+    <div className="min-h-screen bg-white text-gray-900">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex items-start justify-between mb-4">
@@ -261,7 +261,7 @@ export default function IssueDetailsPage() {
             <div className="flex items-center gap-2">
               <div className="flex-1 bg-gray-200 rounded-full h-2">
                 <div
-                  className="bg-blue-600 h-2 rounded-full"
+                  className="bg-green-700 h-2 rounded-full"
                   style={{ width: `${(issue.severity / 5) * 100}%` }}
                 ></div>
               </div>
@@ -297,7 +297,7 @@ export default function IssueDetailsPage() {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Activity Timeline</h2>
           <div className="space-y-4">
             <div className="flex items-start gap-4">
-              <div className="w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
+              <div className="w-2 h-2 bg-green-700 rounded-full mt-2"></div>
               <div>
                 <div className="font-semibold text-gray-900">Report Created</div>
                 <div className="text-sm text-gray-600">
@@ -329,7 +329,7 @@ export default function IssueDetailsPage() {
             </button>
             <Link
               href="/map"
-              className="flex-1 text-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className="flex-1 text-center px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-800"
             >
               View on Map
             </Link>

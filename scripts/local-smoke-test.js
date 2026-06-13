@@ -92,7 +92,7 @@ function assert(condition, message) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email: uniqueEmail,
-        password: "smoketest123",
+        password: "SmokeTest123!",
         displayName: "Smoke Test User",
       }),
     },
@@ -262,7 +262,7 @@ function assert(condition, message) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email: `attacker-${Date.now()}@example.com`,
-        password: "attacker123",
+        password: "Attacker123!",
         displayName: "Attacker User",
       }),
     },

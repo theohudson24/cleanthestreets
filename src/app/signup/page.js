@@ -93,7 +93,7 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900 flex items-center justify-center px-4 py-12 text-slate-100">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4 py-12 text-gray-900">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">Sign Up</h1>
 
@@ -118,7 +118,7 @@ export default function SignUpPage() {
               value={formData.displayName}
               onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
             />
           </div>
 
@@ -132,7 +132,7 @@ export default function SignUpPage() {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
             />
           </div>
 
@@ -149,7 +149,7 @@ export default function SignUpPage() {
               minLength={8}
               autoComplete="new-password"
               title={PASSWORD_ERROR_MESSAGE}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
             />
             <div className="mt-2 space-y-0.5">
               {passwordChecks.map((requirement) => (
@@ -157,8 +157,8 @@ export default function SignUpPage() {
                   key={requirement.label}
                   className={`text-xs font-medium transition ${
                     requirement.met
-                      ? 'text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.35)]'
-                      : 'text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.3)]'
+                      ? 'text-green-700'
+                      : 'text-red-500'
                   }`}
                 >
                   {requirement.label}
@@ -178,14 +178,14 @@ export default function SignUpPage() {
               onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
               required
               autoComplete="new-password"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="flex items-center justify-center">
@@ -201,7 +201,7 @@ export default function SignUpPage() {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             Already have an account?{' '}
-            <Link href="/signin" className="text-blue-600 hover:text-blue-800">
+            <Link href="/signin" className="text-green-700 hover:text-green-900">
               Sign in
             </Link>
           </p>

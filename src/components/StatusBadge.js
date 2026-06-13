@@ -4,7 +4,7 @@ export default function StatusBadge({ status, className = '' }) {
   const getStatusConfig = (status) => {
     switch (status) {
       case 'reported':
-        return { text: 'Reported', bg: 'bg-blue-500', textColor: 'text-white' };
+        return { text: 'Reported', bg: 'bg-green-600', textColor: 'text-white' };
       case 'in_progress':
         return { text: 'In Progress', bg: 'bg-yellow-500', textColor: 'text-white' };
       case 'fixed':

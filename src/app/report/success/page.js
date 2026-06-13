@@ -48,7 +48,7 @@ function ReportSuccessPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900 text-slate-100">
+    <div className="min-h-screen bg-white text-gray-900">
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -78,7 +78,7 @@ function ReportSuccessPageContent() {
               <>
                 <Link
                   href={`/issue/${reportId}`}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-6 py-3 bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors"
                 >
                   View Report
                 </Link>
@@ -98,7 +98,7 @@ function ReportSuccessPageContent() {
             </Link>
             <Link
               href="/profile"
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-6 py-3 bg-green-700 text-white rounded-lg hover:bg-green-800 transition-colors"
             >
               View Profile
             </Link>
@@ -113,7 +113,7 @@ export default function ReportSuccessPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-slate-950">
+        <div className="min-h-screen flex items-center justify-center bg-white">
           <LoadingSpinner size="lg" />
         </div>
       }

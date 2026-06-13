@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function HelpPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-900 text-slate-100">
+    <div className="min-h-screen bg-white text-gray-900">
       <div className="max-w-4xl mx-auto px-4 py-16">
         <h1 className="text-4xl font-bold text-gray-900 mb-8">Help & FAQ</h1>
 
@@ -83,7 +83,7 @@ export default function HelpPage() {
           </p>
           <p className="text-gray-700 mt-4">
             Or use our{' '}
-            <Link href="/report" className="text-blue-600 hover:text-blue-800 underline">
+            <Link href="/report" className="text-green-700 hover:text-green-900 underline">
               contact form
             </Link>
             .
